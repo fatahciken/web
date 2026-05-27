@@ -17,6 +17,35 @@
             min-height: 100vh;
             padding: 20px;
         }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-name {
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+        .btn-logout {
+            padding: 8px 15px;
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-logout:hover {
+            background: #ff5252;
+        }
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -246,6 +275,14 @@
     </style>
 </head>
 <body>
+    <div class="header">
+        <div></div>
+        <div class="user-info">
+            <span class="user-name" id="userName"></span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
     <div class="container">
         <h1>AI Image Generator</h1>
         <p class="subtitle">Generate anime and realistic images instantly</p>
@@ -306,6 +343,23 @@
     </div>
 
     <script>
+        // Cek login
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // Tampilkan nama user
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (userData) {
+            document.getElementById('userName').textContent = userData.name;
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userData');
+            window.location.href = 'login.html';
+        }
+
         let history = [];
 
         if (localStorage.getItem('imageHistory')) {
