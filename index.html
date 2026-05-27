@@ -17,35 +17,6 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .user-name {
-            color: #4ecdc4;
-            font-weight: bold;
-        }
-        .btn-logout {
-            padding: 8px 15px;
-            background: #ff6b6b;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .btn-logout:hover {
-            background: #ff5252;
-        }
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -196,20 +167,33 @@
             font-size: 12px;
             margin-bottom: 10px;
         }
-        .btn-download {
-            display: inline-block;
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-download, .btn-copy {
+            flex: 1;
             padding: 8px 15px;
-            background: #4ecdc4;
-            color: #1a1a2e;
-            text-decoration: none;
+            border: none;
             border-radius: 5px;
             font-size: 13px;
             font-weight: bold;
-            border: none;
             cursor: pointer;
+            text-align: center;
+        }
+        .btn-download {
+            background: #4ecdc4;
+            color: #1a1a2e;
         }
         .btn-download:hover {
             background: #45b7aa;
+        }
+        .btn-copy {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .btn-copy:hover {
+            background: rgba(255,255,255,0.2);
         }
         .error-message {
             background: rgba(255,107,107,0.1);
@@ -272,17 +256,27 @@
         .clear-btn:hover {
             background: #ff5252;
         }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div></div>
-        <div class="user-info">
-            <span class="user-name" id="userName"></span>
-            <button class="btn-logout" onclick="logout()">Logout</button>
-        </div>
-    </div>
-
     <div class="container">
         <h1>AI Image Generator</h1>
         <p class="subtitle">Generate anime and realistic images instantly</p>
@@ -342,24 +336,9 @@
         <div class="history-grid" id="historyGrid"></div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
-        // Cek login
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'login.html';
-        }
-
-        // Tampilkan nama user
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if (userData) {
-            document.getElementById('userName').textContent = userData.name;
-        }
-
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userData');
-            window.location.href = 'login.html';
-        }
-
         let history = [];
 
         if (localStorage.getItem('imageHistory')) {
@@ -425,7 +404,10 @@
                             <div class="image-info">
                                 <div class="image-prompt">${escapeHtml(prompt)}</div>
                                 <div class="image-size">Image ${index + 1} | ${size}</div>
-                                <button class="btn-download" onclick="downloadImage('${img.url}', 'image_${index + 1}_${Date.now()}.jpg')">Download</button>
+                                <div class="btn-group">
+                                    <button class="btn-download" onclick="downloadImage('${img.url}', 'image_${index + 1}_${Date.now()}.jpg')">Download</button>
+                                    <button class="btn-copy" onclick="copyImageUrl('${img.url}')">Copy URL</button>
+                                </div>
                             </div>
                         `;
                         results.appendChild(card);
@@ -468,8 +450,25 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
+                showToast('Download dimulai!');
             } catch (error) {
                 window.open(url, '_blank');
+                showToast('Membuka di tab baru...');
+            }
+        }
+
+        async function copyImageUrl(url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast('URL berhasil dicopy!');
+            } catch (error) {
+                const input = document.createElement('input');
+                input.value = url;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast('URL berhasil dicopy!');
             }
         }
 
@@ -480,6 +479,15 @@
             setTimeout(() => {
                 errorMessage.classList.remove('active');
             }, 5000);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
         }
 
         function escapeHtml(text) {
