@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Image Generator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             color: #fff;
@@ -26,11 +22,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .user-section { display: flex; align-items: center; gap: 10px; }
         .user-badge {
             background: rgba(78,205,196,0.2);
             color: #4ecdc4;
@@ -50,25 +42,11 @@
             transition: transform 0.2s;
             white-space: nowrap;
         }
-        .btn:hover {
-            transform: scale(1.05);
-        }
-        .btn-primary {
-            background: #4ecdc4;
-            color: #1a1a2e;
-        }
-        .btn-danger {
-            background: #ff6b6b;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #4ecdc4;
-            color: #4ecdc4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .btn:hover { transform: scale(1.05); }
+        .btn-primary { background: #4ecdc4; color: #1a1a2e; }
+        .btn-danger { background: #ff6b6b; }
+        
+        .container { max-width: 800px; margin: 0 auto; }
         h1 {
             text-align: center;
             font-size: 2.2em;
@@ -77,12 +55,8 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 25px; font-size: 14px; }
+        
         .form-card {
             background: rgba(255,255,255,0.05);
             border-radius: 20px;
@@ -91,17 +65,9 @@
             border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 25px;
         }
-        .form-group {
-            margin-bottom: 18px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #4ecdc4;
-            font-weight: bold;
-            font-size: 13px;
-        }
-        textarea {
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 8px; color: #4ecdc4; font-weight: bold; font-size: 13px; }
+        textarea, input[type="text"] {
             width: 100%;
             padding: 14px;
             border-radius: 10px;
@@ -110,48 +76,30 @@
             color: #fff;
             font-size: 14px;
             resize: vertical;
-            min-height: 70px;
             line-height: 1.5;
         }
-        textarea:focus {
-            outline: none;
-            border-color: #4ecdc4;
-        }
-        select {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        select:focus {
-            outline: none;
-            border-color: #4ecdc4;
-        }
-        select option {
-            background: #1a1a2e;
-            color: #fff;
-        }
+        textarea { min-height: 70px; }
+        textarea:focus, input:focus { outline: none; border-color: #4ecdc4; }
+        .hint { font-size: 11px; color: #888; margin-top: 5px; }
+        
+        /* Preset pills */
         .preset-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
             margin-bottom: 20px;
         }
         .preset-item {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 20px;
+            padding: 8px 16px;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 12px;
             color: #ccc;
-            text-align: left;
-            line-height: 1.4;
+            font-weight: bold;
+            white-space: nowrap;
         }
         .preset-item:hover {
             border-color: #4ecdc4;
@@ -159,27 +107,36 @@
         }
         .preset-item.active {
             border-color: #4ecdc4;
-            background: rgba(78,205,196,0.15);
+            background: rgba(78,205,196,0.2);
             color: #4ecdc4;
         }
-        .preset-item .preset-title {
+        
+        /* Size & Style pills */
+        .option-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .option-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            color: #ccc;
             font-weight: bold;
-            color: #fff;
-            font-size: 13px;
-            margin-bottom: 3px;
+            text-align: center;
+            min-width: 60px;
         }
-        .preset-item.active .preset-title {
+        .option-item:hover {
+            border-color: #4ecdc4;
+            background: rgba(78,205,196,0.1);
+        }
+        .option-item.active {
+            border-color: #4ecdc4;
+            background: rgba(78,205,196,0.2);
             color: #4ecdc4;
         }
-        .preset-item .preset-desc {
-            font-size: 11px;
-            color: #888;
-        }
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
+        .option-icon { display: block; font-size: 16px; margin-bottom: 2px; }
+        
         .btn-generate {
             width: 100%;
             padding: 15px;
@@ -193,44 +150,23 @@
             transition: transform 0.2s;
             margin-top: 5px;
         }
-        .btn-generate:hover {
-            transform: scale(1.02);
-        }
-        .btn-generate:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .loading.active {
-            display: block;
-        }
+        .btn-generate:hover { transform: scale(1.02); }
+        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .loading { display: none; text-align: center; padding: 20px; }
+        .loading.active { display: block; }
         .spinner {
             border: 3px solid rgba(255,255,255,0.1);
             border-top: 3px solid #4ecdc4;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .result-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-        .result-wrapper {
-            position: relative;
-            display: inline-block;
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .result-container { display: flex; justify-content: center; margin-bottom: 10px; }
+        .result-wrapper { position: relative; display: inline-block; }
         .result-image {
             max-width: 100%;
             max-height: 500px;
@@ -239,13 +175,10 @@
             transition: transform 0.3s;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .result-image:hover {
-            transform: scale(1.02);
-        }
+        .result-image:hover { transform: scale(1.02); }
         .result-user {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
+            bottom: 10px; left: 10px;
             background: rgba(0,0,0,0.7);
             color: #4ecdc4;
             padding: 4px 10px;
@@ -253,6 +186,7 @@
             font-size: 11px;
             font-weight: bold;
         }
+        
         .error-message {
             background: rgba(255,107,107,0.1);
             border: 1px solid #ff6b6b;
@@ -263,13 +197,11 @@
             display: none;
             text-align: center;
         }
-        .error-message.active {
-            display: block;
-        }
+        .error-message.active { display: block; }
+        
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 20px; right: 20px;
             background: #2ecc71;
             color: #fff;
             padding: 12px 20px;
@@ -281,20 +213,11 @@
             z-index: 10000;
             font-size: 13px;
         }
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .toast.error {
-            background: #ff6b6b;
-        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { background: #ff6b6b; }
 
-        /* Gallery Tabs */
-        .gallery-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+        /* Gallery */
+        .gallery-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .gallery-tab {
             padding: 10px 20px;
             background: rgba(255,255,255,0.05);
@@ -305,13 +228,7 @@
             font-size: 13px;
             font-weight: bold;
         }
-        .gallery-tab.active {
-            background: #4ecdc4;
-            color: #1a1a2e;
-            border-color: #4ecdc4;
-        }
-
-        /* History Scroll */
+        .gallery-tab.active { background: #4ecdc4; color: #1a1a2e; border-color: #4ecdc4; }
         .history-scroll {
             display: flex;
             gap: 12px;
@@ -320,16 +237,10 @@
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
-        .history-scroll::-webkit-scrollbar {
-            height: 4px;
-        }
-        .history-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-        }
+        .history-scroll::-webkit-scrollbar { height: 4px; }
+        .history-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         .history-card {
-            min-width: 200px;
-            max-width: 200px;
+            min-width: 200px; max-width: 200px;
             flex-shrink: 0;
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
@@ -337,103 +248,50 @@
             border: 1px solid rgba(255,255,255,0.08);
             transition: transform 0.2s;
         }
-        .history-card:hover {
-            transform: scale(1.03);
-        }
-        .history-card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            cursor: pointer;
-        }
-        .history-card .card-info {
-            padding: 10px;
-        }
-        .history-card .card-user {
-            font-size: 10px;
-            color: #4ecdc4;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
+        .history-card:hover { transform: scale(1.03); }
+        .history-card img { width: 100%; height: 150px; object-fit: cover; cursor: pointer; }
+        .history-card .card-info { padding: 10px; }
+        .history-card .card-user { font-size: 10px; color: #4ecdc4; font-weight: bold; margin-bottom: 4px; }
         .history-card .card-prompt {
-            font-size: 10px;
-            color: #888;
+            font-size: 10px; color: #888;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             margin-bottom: 8px;
         }
-        .history-card .card-actions {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        .btn-sm {
-            padding: 4px 8px;
-            border: none;
-            border-radius: 4px;
-            font-size: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-sm-copy {
-            background: #4ecdc4;
-            color: #1a1a2e;
-        }
-        .btn-sm-dl {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-        }
-        .btn-sm-pub {
-            background: #f39c12;
-            color: #fff;
-        }
-        .btn-sm-del {
-            background: #ff6b6b;
-            color: #fff;
-        }
+        .history-card .card-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn-sm { padding: 4px 8px; border: none; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        .btn-sm-copy { background: #4ecdc4; color: #1a1a2e; }
+        .btn-sm-dl { background: rgba(255,255,255,0.2); color: #fff; }
+        .btn-sm-pub { background: #f39c12; color: #fff; }
+        .btn-sm-del { background: #ff6b6b; color: #fff; }
 
-        /* Preview Modal */
+        /* Modals */
         .preview-modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0,0,0,0.95);
             z-index: 9999;
             align-items: center;
             justify-content: center;
             cursor: pointer;
         }
-        .preview-modal.active {
-            display: flex;
-        }
-        .preview-modal img {
-            max-width: 95%;
-            max-height: 95vh;
-            border-radius: 10px;
-            object-fit: contain;
-        }
-
-        /* Auth Modal */
+        .preview-modal.active { display: flex; }
+        .preview-modal img { max-width: 95%; max-height: 95vh; border-radius: 10px; object-fit: contain; }
         .auth-modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0,0,0,0.8);
             z-index: 9998;
             align-items: center;
             justify-content: center;
         }
-        .auth-modal.active {
-            display: flex;
-        }
+        .auth-modal.active { display: flex; }
         .auth-card {
             background: #1a1a2e;
             border-radius: 20px;
@@ -442,12 +300,7 @@
             max-width: 380px;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .auth-title {
-            font-size: 1.3em;
-            color: #4ecdc4;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+        .auth-title { font-size: 1.3em; color: #4ecdc4; margin-bottom: 20px; text-align: center; }
         .auth-input {
             width: 100%;
             padding: 14px;
@@ -458,24 +311,13 @@
             font-size: 14px;
             margin-bottom: 15px;
         }
-        .auth-input:focus {
-            outline: none;
-            border-color: #4ecdc4;
-        }
-        .password-wrapper {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        .password-wrapper .auth-input {
-            margin-bottom: 0;
-            padding-right: 45px;
-        }
+        .auth-input:focus { outline: none; border-color: #4ecdc4; }
+        .password-wrapper { position: relative; margin-bottom: 15px; }
+        .password-wrapper .auth-input { margin-bottom: 0; padding-right: 45px; }
         .toggle-pw {
             position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 45px;
+            right: 0; top: 0;
+            height: 100%; width: 45px;
             background: none;
             border: none;
             color: #4ecdc4;
@@ -486,74 +328,22 @@
             justify-content: center;
             padding: 0;
         }
-        .toggle-pw:hover {
-            color: #fff;
-        }
-        .auth-link {
-            text-align: center;
-            margin-top: 15px;
-            color: #888;
-            font-size: 13px;
-        }
-        .auth-link a {
-            color: #4ecdc4;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
-        }
+        .toggle-pw:hover { color: #fff; }
+        .auth-link { text-align: center; margin-top: 15px; color: #888; font-size: 13px; }
+        .auth-link a { color: #4ecdc4; cursor: pointer; text-decoration: none; font-weight: bold; }
 
-        /* Mobile */
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 1.6em;
-            }
-            .form-card {
-                padding: 15px;
-                border-radius: 15px;
-            }
-            textarea {
-                font-size: 16px;
-                min-height: 60px;
-            }
-            select {
-                font-size: 16px;
-            }
-            .preset-list {
-                grid-template-columns: 1fr 1fr;
-                gap: 6px;
-            }
-            .preset-item {
-                padding: 10px;
-                font-size: 11px;
-            }
-            .preset-item .preset-title {
-                font-size: 11px;
-            }
-            .preset-item .preset-desc {
-                font-size: 10px;
-            }
-            .row {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .btn-generate {
-                padding: 16px;
-                font-size: 16px;
-            }
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .history-card {
-                min-width: 160px;
-                max-width: 160px;
-            }
-            .history-card img {
-                height: 120px;
-            }
+            body { padding: 10px; }
+            h1 { font-size: 1.6em; }
+            .form-card { padding: 15px; border-radius: 15px; }
+            textarea { font-size: 16px; min-height: 60px; }
+            .preset-item { padding: 6px 12px; font-size: 11px; }
+            .option-item { padding: 8px 10px; font-size: 11px; min-width: 50px; }
+            .option-icon { font-size: 14px; }
+            .btn-generate { padding: 16px; font-size: 16px; }
+            .header { flex-direction: column; text-align: center; }
+            .history-card { min-width: 160px; max-width: 160px; }
+            .history-card img { height: 120px; }
         }
     </style>
 </head>
@@ -567,63 +357,86 @@
 
     <div class="container">
         <h1>AI Image Generator</h1>
-        <p class="subtitle">Generate stunning anime and realistic images</p>
+        <p class="subtitle">Cinematic anime art & ultra realistic images</p>
 
         <div class="form-card">
             <form id="generateForm">
-                <!-- Preset Prompts -->
+                <!-- Presets -->
                 <div class="form-group">
-                    <label>Quick Preset</label>
+                    <label>Preset</label>
                     <div class="preset-list" id="presetList">
-                        <div class="preset-item active" data-prompt="Anime style, ultra realistic, super detail, anime character with realistic background and landscape, 8k, masterpiece" data-negative="blurry, low quality, ugly, deformed">
-                            <div class="preset-title">Anime Super Realistik</div>
-                            <div class="preset-desc">Karakter anime + background realistis</div>
+                        <div class="preset-item active" data-prompt="masterpiece, best quality, cinematic lighting, anime art style, hand-drawn aesthetic, modern Japanese anime movie visual, highly detailed background, photorealistic clouds and sky, beautiful architecture, soft natural lighting, lens flare, depth of field, 8k, Makoto Shinkai style" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">
+                            Cinematic Anime
                         </div>
-                        <div class="preset-item" data-prompt="Ultra realistic landscape, padang rumput hijau, langit biru cerah, awan putih, pegunungan jauh, sinar matahari golden hour, 8k, photorealistic" data-negative="blurry, low quality, painting, cartoon">
-                            <div class="preset-title">Padang Rumput</div>
-                            <div class="preset-desc">Pemandangan alam ultra realistis</div>
+                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, girl sitting by crystal clear river, flowing water, detailed rocks, sun rays through trees, photorealistic nature background, hand-drawn anime character, soft lighting, dappled light, Makoto Shinkai aesthetic, 8k, ultra detailed" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">
+                            River Scene
                         </div>
-                        <div class="preset-item" data-prompt="Anime style, girl with long hair, sitting under cherry blossom tree, petals falling, soft lighting, dreamy atmosphere, studio ghibli style, 8k" data-negative="blurry, low quality, ugly, deformed hands">
-                            <div class="preset-title">Anime Ghibli</div>
-                            <div class="preset-desc">Gaya Studio Ghibli yang dreamy</div>
+                        <div class="preset-item" data-prompt="masterpiece, best quality, ultra realistic, photorealistic landscape, vast green meadow, dramatic cumulus clouds, golden hour sunlight, distant mountains, wildflowers, 8k, national geographic, highly detailed nature" data-negative="blurry, low quality, painting, cartoon, anime, illustration, ugly, deformed">
+                            Ultra Realistic
                         </div>
-                        <div class="preset-item" data-prompt="Cyberpunk city, neon lights, rain, anime style, futuristic, highly detailed, 8k, masterpiece" data-negative="blurry, low quality, ugly">
-                            <div class="preset-title">Cyberpunk Anime</div>
-                            <div class="preset-desc">Kota futuristik dengan neon</div>
+                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, couple walking under autumn trees, falling leaves, warm golden light, detailed city park, photorealistic environment, hand-drawn characters, emotional atmosphere, Makoto Shinkai movie scene, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">
+                            Autumn Couple
                         </div>
-                        <div class="preset-item" data-prompt="Ultra realistic, pantai tropis, air jernih, pasir putih, pohon kelapa, matahari terbenam, langit orange dan ungu, 8k, photorealistic" data-negative="blurry, low quality, cartoon, painting">
-                            <div class="preset-title">Pantai Tropis</div>
-                            <div class="preset-desc">Sunset pantai ultra realistis</div>
+                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, train station platform, dramatic sky with sunset clouds, power lines, detailed urban landscape, hand-drawn aesthetic, warm and cool color contrast, highly detailed, Makoto Shinkai style, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">
+                            Urban Sunset
                         </div>
                     </div>
                 </div>
 
+                <!-- Prompt -->
                 <div class="form-group">
                     <label>Prompt</label>
-                    <textarea id="prompt" placeholder="Deskripsikan gambar yang ingin dibuat..." required></textarea>
+                    <textarea id="prompt" placeholder="Deskripsikan gambar yang ingin dibuat... Gunakan [karakter] untuk menyisipkan karakter custom" required></textarea>
+                    <div class="hint">Tips: Gunakan detail seperti pencahayaan, suasana, dan kualitas gambar. Kata kunci: cinematic lighting, photorealistic, 8k, masterpiece</div>
                 </div>
 
-                <div class="row">
-                    <div class="form-group">
-                        <label>Ukuran Gambar</label>
-                        <select id="size">
-                            <option value="1440x720">Landscape (1440x720)</option>
-                            <option value="720x1440">Portrait (720x1440)</option>
-                            <option value="1024x720">Landscape (1024x720)</option>
-                            <option value="720x1024">Portrait (720x1024)</option>
-                            <option value="1024x1024">Square (1024x1024)</option>
-                            <option value="1440x1440">Square HD (1440x1440)</option>
-                        </select>
+                <!-- Negative Prompt -->
+                <div class="form-group">
+                    <label>Negative Prompt</label>
+                    <input type="text" id="negativePrompt" placeholder="Abaikan atau isi elemen yang tidak diinginkan">
+                </div>
+
+                <!-- Size -->
+                <div class="form-group">
+                    <label>Ukuran</label>
+                    <div class="option-list" id="sizeList">
+                        <div class="option-item active" data-value="1440x720">
+                            <span class="option-icon">[=]</span> 1440x720
+                        </div>
+                        <div class="option-item" data-value="720x1440">
+                            <span class="option-icon">[|]</span> 720x1440
+                        </div>
+                        <div class="option-item" data-value="1024x720">
+                            <span class="option-icon">[=]</span> 1024x720
+                        </div>
+                        <div class="option-item" data-value="720x1024">
+                            <span class="option-icon">[|]</span> 720x1024
+                        </div>
+                        <div class="option-item" data-value="1024x1024">
+                            <span class="option-icon">[ ]</span> 1024x1024
+                        </div>
+                        <div class="option-item" data-value="1440x1440">
+                            <span class="option-icon">[ ]</span> 1440x1440
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Style</label>
-                        <select id="style">
-                            <option value="">Default</option>
-                            <option value="anime">Anime</option>
-                            <option value="realistic">Realistic</option>
-                            <option value="3d">3D Render</option>
-                            <option value="painting">Painting</option>
-                        </select>
+                </div>
+
+                <!-- Style -->
+                <div class="form-group">
+                    <label>Style</label>
+                    <div class="option-list" id="styleList">
+                        <div class="option-item active" data-value="">
+                            <span class="option-icon">A</span> Default
+                        </div>
+                        <div class="option-item" data-value="cinematic">
+                            <span class="option-icon">C</span> Cinematic
+                        </div>
+                        <div class="option-item" data-value="realistic">
+                            <span class="option-icon">R</span> Realistic
+                        </div>
+                        <div class="option-item" data-value="ghibli">
+                            <span class="option-icon">G</span> Ghibli
+                        </div>
                     </div>
                 </div>
 
@@ -638,7 +451,6 @@
 
         <div class="error-message" id="errorMessage"></div>
 
-        <!-- Latest Result -->
         <div class="result-container" id="resultContainer"></div>
 
         <!-- Gallery -->
@@ -683,37 +495,29 @@
 
     <script>
         // ============ COOKIE & STORAGE ============
-        function setCookie(name, value, days = 365) {
-            const d = new Date();
-            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+        function setCookie(n, v, d = 365) {
+            const dt = new Date();
+            dt.setTime(dt.getTime() + (d * 24 * 60 * 60 * 1000));
+            document.cookie = `${n}=${v};expires=${dt.toUTCString()};path=/`;
         }
-
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
+        function getCookie(n) {
+            const v = `; ${document.cookie}`;
+            const p = v.split(`; ${n}=`);
+            if (p.length === 2) return p.pop().split(';').shift();
             return null;
         }
+        function deleteCookie(n) { document.cookie = `${n}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`; }
+        function getDB(k) { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch(e) { return {}; } }
+        function setDB(k, d) { localStorage.setItem(k, JSON.stringify(d)); }
 
-        function deleteCookie(name) {
-            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
-        }
-
-        function getDB(key) {
-            try { return JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { return {}; }
-        }
-
-        function setDB(key, data) {
-            localStorage.setItem(key, JSON.stringify(data));
-        }
-
-        // ============ GLOBAL STATE ============
+        // ============ STATE ============
         let usersDB = getDB('usersDB');
         let resultsDB = getDB('resultsDB');
         let publicDB = getDB('publicDB');
         let currentUser = getCookie('ai_user');
         let currentGallery = 'mine';
+        let selectedSize = '1440x720';
+        let selectedStyle = '';
 
         // ============ INIT ============
         if (currentUser) {
@@ -730,34 +534,47 @@
                 document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
                 document.getElementById('prompt').value = this.dataset.prompt;
+                document.getElementById('negativePrompt').value = this.dataset.negative || '';
+            });
+        });
+
+        // Size clicks
+        document.querySelectorAll('#sizeList .option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('#sizeList .option-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                selectedSize = this.dataset.value;
+            });
+        });
+
+        // Style clicks
+        document.querySelectorAll('#styleList .option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('#styleList .option-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                selectedStyle = this.dataset.value;
             });
         });
 
         // ============ AUTH ============
-        function showLoggedIn(username) {
+        function showLoggedIn(u) {
             document.getElementById('userSection').innerHTML = `
-                <span class="user-badge">@${username}</span>
-                <button class="btn btn-danger" onclick="logout()">Logout</button>
-            `;
+                <span class="user-badge">@${u}</span>
+                <button class="btn btn-danger" onclick="logout()">Logout</button>`;
         }
-
         function logout() {
             deleteCookie('ai_user');
             currentUser = null;
-            document.getElementById('userSection').innerHTML = `
-                <button class="btn btn-primary" onclick="showAuthModal('login')">Login</button>
-            `;
+            document.getElementById('userSection').innerHTML = '<button class="btn btn-primary" onclick="showAuthModal(\'login\')">Login</button>';
             document.getElementById('galleryTabs').style.display = 'none';
             renderPublicGallery();
             showToast('Logged out');
         }
-
         function showAuthModal(type) {
             document.getElementById('authModal').classList.add('active');
             document.getElementById('authError').classList.remove('active');
             document.getElementById('authError').style.display = 'none';
             document.getElementById('authForm').reset();
-            
             if (type === 'login') {
                 document.getElementById('authTitle').textContent = 'Login';
                 document.getElementById('confirmGroup').style.display = 'none';
@@ -772,12 +589,10 @@
                 document.getElementById('authForm').dataset.type = 'register';
             }
         }
-
         function switchAuth() {
             const t = document.getElementById('authForm').dataset.type;
             showAuthModal(t === 'login' ? 'register' : 'login');
         }
-
         function togglePassword() {
             const pw = document.getElementById('authPassword');
             const cf = document.getElementById('authConfirm');
@@ -788,37 +603,30 @@
         document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const type = this.dataset.type;
-            const username = document.getElementById('authUsername').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            const confirm = document.getElementById('authConfirm').value.trim();
-            const authError = document.getElementById('authError');
-
-            authError.classList.remove('active');
-            authError.style.display = 'none';
-
-            if (!username || !password) return showAuthError('Semua field harus diisi!');
-            if (username.length < 3) return showAuthError('Username minimal 3 karakter!');
-            if (password.length < 4) return showAuthError('Password minimal 4 karakter!');
-
+            const u = document.getElementById('authUsername').value.trim();
+            const p = document.getElementById('authPassword').value.trim();
+            const c = document.getElementById('authConfirm').value.trim();
+            const ae = document.getElementById('authError');
+            ae.classList.remove('active'); ae.style.display = 'none';
+            if (!u || !p) return showAuthError('Semua field harus diisi!');
+            if (u.length < 3) return showAuthError('Username minimal 3 karakter!');
+            if (p.length < 4) return showAuthError('Password minimal 4 karakter!');
             usersDB = getDB('usersDB');
-
             if (type === 'register') {
-                if (password !== confirm) return showAuthError('Password tidak cocok!');
-                if (usersDB[username]) return showAuthError('Username sudah terdaftar!');
-                
-                usersDB[username] = { password, created: new Date().toISOString() };
+                if (p !== c) return showAuthError('Password tidak cocok!');
+                if (usersDB[u]) return showAuthError('Username sudah terdaftar!');
+                usersDB[u] = { password: p, created: new Date().toISOString() };
                 setDB('usersDB', usersDB);
-                setCookie('ai_user', username);
-                currentUser = username;
+                setCookie('ai_user', u);
+                currentUser = u;
                 finishAuth('Registrasi berhasil!');
             } else {
-                if (!usersDB[username] || usersDB[username].password !== password) return showAuthError('Username atau password salah!');
-                setCookie('ai_user', username);
-                currentUser = username;
+                if (!usersDB[u] || usersDB[u].password !== p) return showAuthError('Username atau password salah!');
+                setCookie('ai_user', u);
+                currentUser = u;
                 finishAuth('Login berhasil!');
             }
         });
-
         function finishAuth(msg) {
             showLoggedIn(currentUser);
             document.getElementById('authModal').classList.remove('active');
@@ -828,14 +636,12 @@
             renderGallery();
             showToast(msg);
         }
-
         function showAuthError(msg) {
             const ae = document.getElementById('authError');
             ae.textContent = msg;
             ae.classList.add('active');
             ae.style.display = 'block';
         }
-
         document.getElementById('authModal').addEventListener('click', function(e) {
             if (e.target === this) this.classList.remove('active');
         });
@@ -843,35 +649,28 @@
         // ============ GENERATE ============
         document.getElementById('generateForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
-            if (!currentUser) {
-                showToast('Silakan login terlebih dahulu!', true);
-                showAuthModal('login');
-                return;
-            }
+            if (!currentUser) { showToast('Silakan login dulu!', true); showAuthModal('login'); return; }
 
             const prompt = document.getElementById('prompt').value.trim();
-            const size = document.getElementById('size').value;
-            const style = document.getElementById('style').value;
+            const negativePrompt = document.getElementById('negativePrompt').value.trim();
             const btnGenerate = document.getElementById('btnGenerate');
             const loading = document.getElementById('loading');
             const errorMessage = document.getElementById('errorMessage');
             const resultContainer = document.getElementById('resultContainer');
-
             errorMessage.classList.remove('active');
-            errorMessage.textContent = '';
             resultContainer.innerHTML = '';
 
-            if (!prompt) {
-                showError('Prompt tidak boleh kosong!');
-                return;
-            }
+            if (!prompt) { showError('Prompt tidak boleh kosong!'); return; }
 
+            // Build prompt with style
             let finalPrompt = prompt;
-            if (style === 'anime') finalPrompt = 'Anime style, ' + prompt;
-            if (style === 'realistic') finalPrompt = 'Ultra realistic, photorealistic, ' + prompt;
-            if (style === '3d') finalPrompt = '3D render, highly detailed, ' + prompt;
-            if (style === 'painting') finalPrompt = 'Digital painting, masterpiece, ' + prompt;
+            const stylePrefixes = {
+                cinematic: 'masterpiece, best quality, cinematic lighting, anime art style, hand-drawn aesthetic, Makoto Shinkai style, photorealistic background, highly detailed, 8k, ',
+                realistic: 'masterpiece, best quality, ultra realistic, photorealistic, highly detailed, 8k, national geographic, ',
+                ghibli: 'masterpiece, best quality, Studio Ghibli art style, hand-drawn animation, soft pastel colors, dreamy atmosphere, highly detailed, ',
+                '': ''
+            };
+            finalPrompt = (stylePrefixes[selectedStyle] || '') + prompt;
 
             loading.classList.add('active');
             btnGenerate.disabled = true;
@@ -881,35 +680,35 @@
                 const response = await fetch('/api/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: finalPrompt, negativePrompt: '', size, jumlah: 1, username: currentUser })
+                    body: JSON.stringify({
+                        prompt: finalPrompt,
+                        negativePrompt,
+                        size: selectedSize,
+                        jumlah: 1,
+                        username: currentUser
+                    })
                 });
-
                 const data = await response.json();
 
                 if (data.success && data.images && data.images.length > 0) {
                     const img = data.images[0];
-                    
-                    // Show result
                     resultContainer.innerHTML = `
                         <div class="result-wrapper">
                             <img src="${img.url}" alt="Generated" class="result-image" onclick="openPreview('${img.url}')" loading="lazy">
                             <span class="result-user">@${currentUser}</span>
-                        </div>
-                    `;
+                        </div>`;
 
-                    // Save
                     resultsDB = getDB('resultsDB');
                     if (!resultsDB[currentUser]) resultsDB[currentUser] = [];
                     resultsDB[currentUser].unshift({
                         url: img.url,
                         prompt: finalPrompt,
-                        size,
+                        size: selectedSize,
                         timestamp: new Date().toISOString(),
                         public: false
                     });
                     if (resultsDB[currentUser].length > 50) resultsDB[currentUser] = resultsDB[currentUser].slice(0, 50);
                     setDB('resultsDB', resultsDB);
-
                     renderGallery();
                     showToast('Gambar berhasil dibuat!');
                 } else {
@@ -931,25 +730,16 @@
             event.target.classList.add('active');
             renderGallery();
         }
-
         function renderGallery() {
             if (!currentUser) return renderPublicGallery();
-
             resultsDB = getDB('resultsDB');
             publicDB = getDB('publicDB');
-            const container = document.getElementById('historyScroll');
+            const c = document.getElementById('historyScroll');
+            let items = currentGallery === 'mine'
+                ? (resultsDB[currentUser] || []).map(r => ({ ...r, user: currentUser }))
+                : Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-            let items = [];
-            if (currentGallery === 'mine') {
-                items = (resultsDB[currentUser] || []).map(r => ({ ...r, user: currentUser }));
-            } else {
-                items = Object.keys(publicDB).map(user => 
-                    publicDB[user].map(r => ({ ...r, user }))
-                ).flat();
-                items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            }
-
-            container.innerHTML = items.length === 0 
+            c.innerHTML = items.length === 0
                 ? '<p style="color:#888;padding:20px;">Belum ada gambar</p>'
                 : items.map((r, i) => `
                     <div class="history-card">
@@ -966,19 +756,13 @@
                                 ` : ''}
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`).join('');
         }
-
         function renderPublicGallery() {
             publicDB = getDB('publicDB');
-            const container = document.getElementById('historyScroll');
-            let items = Object.keys(publicDB).map(user => 
-                publicDB[user].map(r => ({ ...r, user }))
-            ).flat();
-            items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            container.innerHTML = items.length === 0 
+            const c = document.getElementById('historyScroll');
+            let items = Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            c.innerHTML = items.length === 0
                 ? '<p style="color:#888;padding:20px;">Belum ada gambar publik</p>'
                 : items.map(r => `
                     <div class="history-card">
@@ -991,41 +775,32 @@
                                 <button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`).join('');
         }
-
-        function togglePublic(username, index) {
+        function togglePublic(user, idx) {
             resultsDB = getDB('resultsDB');
             publicDB = getDB('publicDB');
-            
-            const item = resultsDB[username][index];
+            const item = resultsDB[user][idx];
             item.public = !item.public;
-            resultsDB[username][index] = item;
+            resultsDB[user][idx] = item;
             setDB('resultsDB', resultsDB);
-
             if (item.public) {
-                if (!publicDB[username]) publicDB[username] = [];
-                publicDB[username].push(item);
+                if (!publicDB[user]) publicDB[user] = [];
+                publicDB[user].push(item);
             } else {
-                if (publicDB[username]) {
-                    publicDB[username] = publicDB[username].filter(p => p.url !== item.url);
-                }
+                if (publicDB[user]) publicDB[user] = publicDB[user].filter(p => p.url !== item.url);
             }
             setDB('publicDB', publicDB);
             renderGallery();
             showToast(item.public ? 'Dipublikasikan!' : 'Diunpublish');
         }
-
-        function deleteMyImage(index) {
+        function deleteMyImage(idx) {
             if (!confirm('Hapus gambar ini?')) return;
             resultsDB = getDB('resultsDB');
             publicDB = getDB('publicDB');
-            
-            const item = resultsDB[currentUser][index];
-            resultsDB[currentUser].splice(index, 1);
+            const item = resultsDB[currentUser][idx];
+            resultsDB[currentUser].splice(idx, 1);
             setDB('resultsDB', resultsDB);
-
             if (publicDB[currentUser]) {
                 publicDB[currentUser] = publicDB[currentUser].filter(p => p.url !== item.url);
                 setDB('publicDB', publicDB);
@@ -1039,18 +814,13 @@
             document.getElementById('previewImage').src = url;
             document.getElementById('previewModal').classList.add('active');
         }
-
-        document.getElementById('previewModal').addEventListener('click', function() {
-            this.classList.remove('active');
-        });
-
+        document.getElementById('previewModal').addEventListener('click', function() { this.classList.remove('active'); });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 document.getElementById('previewModal').classList.remove('active');
                 document.getElementById('authModal').classList.remove('active');
             }
         });
-
         async function downloadImage(url) {
             try {
                 const r = await fetch(url);
@@ -1061,22 +831,17 @@
                 a.click();
                 URL.revokeObjectURL(a.href);
                 showToast('Download dimulai!');
-            } catch(e) {
-                window.open(url, '_blank');
-            }
+            } catch(e) { window.open(url, '_blank'); }
         }
-
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => showToast('Copied!')).catch(() => showToast('Gagal copy'));
+        function copyText(t) {
+            navigator.clipboard.writeText(t).then(() => showToast('Copied!')).catch(() => showToast('Gagal copy'));
         }
-
         function showError(msg) {
             const el = document.getElementById('errorMessage');
             el.textContent = msg;
             el.classList.add('active');
             setTimeout(() => el.classList.remove('active'), 5000);
         }
-
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -1084,10 +849,9 @@
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2000);
         }
-
-        function escapeHtml(text) {
+        function escapeHtml(t) {
             const d = document.createElement('div');
-            d.textContent = text;
+            d.textContent = t;
             return d.innerHTML;
         }
     </script>
