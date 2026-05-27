@@ -3,388 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - AI Image Generator</title>
+    <title>Admin Panel</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle {
-            color: #888;
-            margin-bottom: 30px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .stat-label {
-            color: #888;
-            font-size: 13px;
-            margin-bottom: 10px;
-        }
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #4ecdc4;
-        }
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .tab.active {
-            background: #4ecdc4;
-            color: #1a1a2e;
-            border-color: #4ecdc4;
-        }
-        .panel-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th {
-            text-align: left;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            color: #4ecdc4;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-size: 13px;
-        }
-        td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 13px;
-        }
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .btn-copy {
-            background: #4ecdc4;
-            color: #1a1a2e;
-        }
-        .btn-view {
-            background: #f39c12;
-            color: #fff;
-        }
-        .btn-delete {
-            background: #ff6b6b;
-            color: #fff;
-        }
-        .btn:hover {
-            transform: scale(1.05);
-        }
-        .user-badge {
-            background: rgba(78,205,196,0.2);
-            color: #4ecdc4;
-            padding: 4px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-        }
-        .prompt-cell {
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal img {
-            max-width: 90%;
-            max-height: 90vh;
-            border-radius: 10px;
-        }
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2ecc71;
-            color: #fff;
-            padding: 15px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 10000;
-        }
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { font-size: 2em; margin-bottom: 5px; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { color: #888; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-label { color: #888; font-size: 13px; margin-bottom: 10px; }
+        .stat-value { font-size: 2em; font-weight: bold; color: #4ecdc4; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .tab.active { background: #4ecdc4; color: #1a1a2e; border-color: #4ecdc4; }
+        .panel-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; background: rgba(255,255,255,0.05); color: #4ecdc4; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; vertical-align: middle; }
+        .btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-copy { background: #4ecdc4; color: #1a1a2e; }
+        .btn-delete { background: #ff6b6b; color: #fff; }
+        .btn:hover { transform: scale(1.05); }
+        .user-badge { background: rgba(78,205,196,0.2); color: #4ecdc4; padding: 4px 10px; border-radius: 10px; font-size: 11px; }
+        .prompt-cell { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .thumb-img { width: 80px; height: 60px; object-fit: cover; border-radius: 5px; cursor: pointer; }
+        .mail-card { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; }
+        .mail-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .mail-from { color: #4ecdc4; font-weight: bold; font-size: 13px; }
+        .mail-time { color: #888; font-size: 11px; }
+        .mail-body { color: #ccc; font-size: 13px; line-height: 1.5; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #2ecc71; color: #fff; padding: 12px 20px; border-radius: 10px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 10000; font-size: 13px; }
+        .toast.show { transform: translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Admin Panel</h1>
-        <p class="subtitle">AI Image Generator Management</p>
+        <p class="subtitle">AI Image Generator - Dashboard</p>
 
-        <!-- Stats -->
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Users</div>
-                <div class="stat-value" id="totalUsers">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Images</div>
-                <div class="stat-value" id="totalImages">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Today Generate</div>
-                <div class="stat-value" id="todayGen">0</div>
-            </div>
+            <div class="stat-card"><div class="stat-label">Total User</div><div class="stat-value" id="totalUsers">0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Gambar</div><div class="stat-value" id="totalImages">0</div></div>
+            <div class="stat-card"><div class="stat-label">Hari Ini</div><div class="stat-value" id="todayGen">0</div></div>
+            <div class="stat-card"><div class="stat-label">Pesan Masuk</div><div class="stat-value" id="totalMail">0</div></div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" onclick="switchTab('users')">User List</button>
-            <button class="tab" onclick="switchTab('results')">Image Results</button>
+            <button class="tab" onclick="switchTab('results')">Hasil Gambar</button>
+            <button class="tab" onclick="switchTab('mail')">Kotak Saran</button>
         </div>
 
-        <!-- Users Tab -->
         <div class="panel-card" id="tabUsers">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Password</th>
-                        <th>Total Images</th>
-                        <th>Created</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="userTable"></tbody>
-            </table>
+            <table><thead><tr><th>Username</th><th>Password</th><th>Total Gambar</th><th>Dibuat</th><th>Aksi</th></tr></thead><tbody id="userTable"></tbody></table>
         </div>
 
-        <!-- Results Tab -->
         <div class="panel-card" id="tabResults" style="display:none;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Prompt</th>
-                        <th>Size</th>
-                        <th>Time</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsTable"></tbody>
-            </table>
+            <table><thead><tr><th>Preview</th><th>User</th><th>Prompt</th><th>Size</th><th>Waktu</th><th>Aksi</th></tr></thead><tbody id="resultsTable"></tbody></table>
         </div>
-    </div>
 
-    <!-- Image Modal -->
-    <div class="modal" id="imageModal">
-        <img id="modalImg" src="" alt="Preview">
+        <div class="panel-card" id="tabMail" style="display:none;">
+            <div id="mailList"></div>
+        </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
         let currentTab = 'users';
-
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById('tabUsers').style.display = tab === 'users' ? 'block' : 'none';
             document.getElementById('tabResults').style.display = tab === 'results' ? 'block' : 'none';
+            document.getElementById('tabMail').style.display = tab === 'mail' ? 'block' : 'none';
             event.target.classList.add('active');
             loadData();
         }
 
         function loadData() {
-            // Load users
-            let usersDB = {};
-            if (localStorage.getItem('usersDB')) {
-                try { usersDB = JSON.parse(localStorage.getItem('usersDB')); } catch(e) {}
-            }
+            let usersDB = {}; try { usersDB = JSON.parse(localStorage.getItem('usersDB') || '{}'); } catch(e) {}
+            let resultsDB = {}; try { resultsDB = JSON.parse(localStorage.getItem('resultsDB') || '{}'); } catch(e) {}
+            let saranDB = []; try { saranDB = JSON.parse(localStorage.getItem('saranDB') || '[]'); } catch(e) {}
+            if (!Array.isArray(saranDB)) saranDB = [];
 
-            // Load results
-            let resultsDB = {};
-            if (localStorage.getItem('resultsDB')) {
-                try { resultsDB = JSON.parse(localStorage.getItem('resultsDB')); } catch(e) {}
-            }
-
-            // Update stats
             const totalUsers = Object.keys(usersDB).length;
-            let totalImages = 0;
-            let allResults = [];
-
-            Object.keys(resultsDB).forEach(user => {
-                resultsDB[user].forEach(r => {
-                    totalImages++;
-                    allResults.push({ ...r, user });
-                });
-            });
-
+            let totalImages = 0, allResults = [];
+            Object.keys(resultsDB).forEach(user => { resultsDB[user].forEach(r => { totalImages++; allResults.push({ ...r, user }); }); });
             allResults.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
             const today = new Date().toDateString();
             const todayGen = allResults.filter(r => new Date(r.timestamp).toDateString() === today).length;
 
             document.getElementById('totalUsers').textContent = totalUsers;
             document.getElementById('totalImages').textContent = totalImages;
             document.getElementById('todayGen').textContent = todayGen;
+            document.getElementById('totalMail').textContent = saranDB.length;
 
-            // Render users
-            const userTable = document.getElementById('userTable');
-            userTable.innerHTML = Object.keys(usersDB).map(username => {
-                const userImages = resultsDB[username] ? resultsDB[username].length : 0;
-                return `
-                    <tr>
-                        <td><span class="user-badge">@${username}</span></td>
-                        <td>${usersDB[username].password}</td>
-                        <td>${userImages}</td>
-                        <td>${new Date(usersDB[username].created).toLocaleDateString('id-ID')}</td>
-                        <td>
-                            <button class="btn btn-delete" onclick="deleteUser('${username}')">Hapus</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('') || '<tr><td colspan="5" style="text-align:center;color:#888;">Belum ada user</td></tr>';
+            document.getElementById('userTable').innerHTML = Object.keys(usersDB).map(u => `<tr><td><span class="user-badge">@${u}</span></td><td>${usersDB[u].password}</td><td>${(resultsDB[u]||[]).length}</td><td>${new Date(usersDB[u].created).toLocaleDateString('id-ID')}</td><td><button class="btn btn-delete" onclick="deleteUser('${u}')">Hapus</button></td></tr>`).join('') || '<tr><td colspan="5" style="color:#888;">Belum ada user</td></tr>';
 
-            // Render results
-            const resultsTable = document.getElementById('resultsTable');
-            resultsTable.innerHTML = allResults.map((r, i) => `
-                <tr>
-                    <td><span class="user-badge">@${r.user}</span></td>
-                    <td class="prompt-cell" title="${escapeHtml(r.prompt)}">${escapeHtml(r.prompt)}</td>
-                    <td>${r.size}</td>
-                    <td>${new Date(r.timestamp).toLocaleString('id-ID')}</td>
-                    <td>
-                        <button class="btn btn-view" onclick="viewImage('${r.url}')">View</button>
-                        <button class="btn btn-copy" onclick="copyText('${r.url}')">Copy URL</button>
-                        <button class="btn btn-copy" onclick="copyText('${escapeHtml(r.prompt)}')">Copy Prompt</button>
-                        <button class="btn btn-delete" onclick="deleteResult('${r.user}', ${i})">Hapus</button>
-                    </td>
-                </tr>
-            `).join('') || '<tr><td colspan="5" style="text-align:center;color:#888;">Belum ada hasil</td></tr>';
+            document.getElementById('resultsTable').innerHTML = allResults.map((r, i) => `<tr><td><img src="${r.url}" class="thumb-img" onclick="window.open('${r.url}')" title="Klik untuk full size"></td><td><span class="user-badge">@${r.user}</span></td><td class="prompt-cell" title="${escapeHtml(r.prompt||'')}">${escapeHtml(r.prompt||'')}</td><td>${r.size}</td><td>${new Date(r.timestamp).toLocaleString('id-ID')}</td><td><button class="btn btn-copy" onclick="copyText('${r.url}')">Copy URL</button> <button class="btn btn-copy" onclick="copyText('${escapeHtml(r.prompt||'')}')">Copy Prompt</button> <button class="btn btn-delete" onclick="deleteResult('${r.user}',${i})">Hapus</button></td></tr>`).join('') || '<tr><td colspan="6" style="color:#888;">Belum ada hasil</td></tr>';
+
+            document.getElementById('mailList').innerHTML = saranDB.length === 0 ? '<p style="color:#888;">Belum ada saran masuk</p>' : saranDB.map((m, i) => `<div class="mail-card"><div class="mail-header"><span class="mail-from">Dari: ${escapeHtml(m.nama)}</span><span class="mail-time">${new Date(m.timestamp).toLocaleString('id-ID')}</span></div><div class="mail-body">${escapeHtml(m.pesan)}</div></div>`).join('');
         }
 
-        window.deleteUser = function(username) {
-            if (confirm(`Hapus user @${username} dan semua hasilnya?`)) {
-                let usersDB = JSON.parse(localStorage.getItem('usersDB') || '{}');
-                let resultsDB = JSON.parse(localStorage.getItem('resultsDB') || '{}');
-                
-                delete usersDB[username];
-                delete resultsDB[username];
-                
-                localStorage.setItem('usersDB', JSON.stringify(usersDB));
-                localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
-                
-                loadData();
-                showToast(`User @${username} dihapus`);
-            }
-        };
-
-        window.deleteResult = function(username, index) {
+        window.deleteUser = function(u) { if (confirm(`Hapus @${u}?`)) { let udb = JSON.parse(localStorage.getItem('usersDB')||'{}'); let rdb = JSON.parse(localStorage.getItem('resultsDB')||'{}'); delete udb[u]; delete rdb[u]; localStorage.setItem('usersDB', JSON.stringify(udb)); localStorage.setItem('resultsDB', JSON.stringify(rdb)); loadData(); showToast('User dihapus'); } };
+        window.deleteResult = function(user, idx) {
             if (confirm('Hapus hasil ini?')) {
-                let resultsDB = JSON.parse(localStorage.getItem('resultsDB') || '{}');
-                if (resultsDB[username]) {
-                    resultsDB[username].splice(index, 1);
-                    localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
-                    loadData();
-                    showToast('Hasil dihapus');
-                }
+                let rdb = JSON.parse(localStorage.getItem('resultsDB')||'{}');
+                let pdb = JSON.parse(localStorage.getItem('publicDB')||'{}');
+                const item = rdb[user][idx];
+                rdb[user].splice(idx, 1);
+                localStorage.setItem('resultsDB', JSON.stringify(rdb));
+                if (pdb[user]) { pdb[user] = pdb[user].filter(p => p.url !== item.url); localStorage.setItem('publicDB', JSON.stringify(pdb)); }
+                loadData();
+                showToast('Hasil dihapus');
             }
         };
-
-        window.viewImage = function(url) {
-            document.getElementById('modalImg').src = url;
-            document.getElementById('imageModal').classList.add('active');
-        };
-
-        document.getElementById('imageModal').addEventListener('click', function() {
-            this.classList.remove('active');
-        });
-
-        window.copyText = function(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Berhasil dicopy!');
-            }).catch(() => {
-                const input = document.createElement('input');
-                input.value = text;
-                document.body.appendChild(input);
-                input.select();
-                document.execCommand('copy');
-                document.body.removeChild(input);
-                showToast('Berhasil dicopy!');
-            });
-        };
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Load data every 5 seconds
+        window.copyText = function(t) { navigator.clipboard.writeText(t).then(() => showToast('Copied!')).catch(() => showToast('Gagal')); };
+        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         loadData();
         setInterval(loadData, 5000);
     </script>
