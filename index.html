@@ -80,7 +80,7 @@
         }
         textarea { min-height: 70px; }
         textarea:focus, input:focus { outline: none; border-color: #4ecdc4; }
-        .hint { font-size: 11px; color: #888; margin-top: 5px; }
+        .hint { font-size: 11px; color: #888; margin-top: 5px; line-height: 1.5; }
         
         /* Preset pills */
         .preset-list {
@@ -152,6 +152,7 @@
             font-size: 16px;
             width: 24px;
             text-align: center;
+            font-weight: bold;
         }
         
         .btn-generate {
@@ -233,6 +234,44 @@
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast.error { background: #ff6b6b; }
 
+        /* Saran Box */
+        .saran-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 25px;
+        }
+        .saran-icon {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .saran-title {
+            text-align: center;
+            color: #4ecdc4;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .btn-saran {
+            width: 100%;
+            padding: 12px;
+            background: rgba(78,205,196,0.2);
+            border: 1px solid #4ecdc4;
+            border-radius: 10px;
+            color: #4ecdc4;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-saran:hover {
+            background: rgba(78,205,196,0.3);
+            transform: scale(1.02);
+        }
+
         /* Gallery */
         .gallery-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .gallery-tab {
@@ -298,7 +337,7 @@
         }
         .preview-modal.active { display: flex; }
         .preview-modal img { max-width: 95%; max-height: 95vh; border-radius: 10px; object-fit: contain; }
-        .auth-modal {
+        .auth-modal, .saran-modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
@@ -308,13 +347,13 @@
             align-items: center;
             justify-content: center;
         }
-        .auth-modal.active { display: flex; }
-        .auth-card {
+        .auth-modal.active, .saran-modal.active { display: flex; }
+        .auth-card, .saran-card-modal {
             background: #1a1a2e;
             border-radius: 20px;
             padding: 30px;
             width: 90%;
-            max-width: 380px;
+            max-width: 420px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         .auth-title { font-size: 1.3em; color: #4ecdc4; margin-bottom: 20px; text-align: center; }
@@ -373,33 +412,33 @@
 
     <div class="container">
         <h1>AI Image Generator</h1>
-        <p class="subtitle">Cinematic anime art & ultra realistic images</p>
+        <p class="subtitle">Bikin gambar kece ala cinematic anime & realistic, no cap! ✨</p>
 
         <div class="form-card">
             <form id="generateForm">
                 <!-- Presets -->
                 <div class="form-group">
-                    <label>Preset</label>
+                    <label>Preset Pilihan (opsional, klik dulu baru nyala)</label>
                     <div class="preset-list" id="presetList">
-                        <div class="preset-item active" data-prompt="masterpiece, best quality, cinematic lighting, anime art style, hand-drawn aesthetic, modern Japanese anime movie visual, highly detailed background, photorealistic clouds and sky, beautiful architecture, soft natural lighting, lens flare, depth of field, 8k, Makoto Shinkai style" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Cinematic Anime</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, girl sitting by crystal clear river, flowing water, detailed rocks, sun rays through trees, photorealistic nature background, hand-drawn anime character, soft lighting, dappled light, Makoto Shinkai aesthetic, 8k, ultra detailed" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">River Scene</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, ultra realistic, photorealistic landscape, vast green meadow, dramatic cumulus clouds, golden hour sunlight, distant mountains, wildflowers, 8k, national geographic, highly detailed nature" data-negative="blurry, low quality, painting, cartoon, anime, illustration, ugly, deformed">Ultra Realistic</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, couple walking under autumn trees, falling leaves, warm golden light, detailed city park, photorealistic environment, hand-drawn characters, emotional atmosphere, Makoto Shinkai movie scene, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Autumn Couple</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, train station platform, dramatic sky with sunset clouds, power lines, detailed urban landscape, hand-drawn aesthetic, warm and cool color contrast, highly detailed, Makoto Shinkai style, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Urban Sunset</div>
+                        <div class="preset-item" data-prompt="mahakarya, kualitas terbaik, sinematik, pemandangan alam super detail, langit dramatis, awan fotorealistik, pencahayaan golden hour, karakter anime art style menyatu dengan background realistis, detail tinggi, 8k, ala Makoto Shinkai" data-negative="3d render, cgi, kartun, flat, sederhana, jelek, aneh, blur, resolusi rendah">Pemandangan HD + Karakter</div>
+                        <div class="preset-item" data-prompt="mahakarya, kualitas terbaik, ultra realistis, fotorealistik, padang rumput hijau luas, awan kumulus dramatis, sinar mentari sore, gunung di kejauhan, bunga liar, 8k, national geographic" data-negative="blur, resolusi rendah, lukisan, kartun, anime, ilutrasi, jelek, aneh">Alam Ultra Realistis</div>
+                        <div class="preset-item" data-prompt="mahakarya, kualitas terbaik, sinematik, anime art style, cewek duduk di tepi sungai kristal, air mengalir jernih, bebatuan detail, sinar mentari menembus pohon, background alam fotorealistik, karakter hand-drawn, soft lighting, 8k" data-negative="3d render, cgi, kartun, flat, sederhana, jelek, aneh, blur, resolusi rendah">Sungai Kristal</div>
+                        <div class="preset-item" data-prompt="mahakarya, kualitas terbaik, sinematik, anime art style, stasiun kereta sore hari, langit jingga keunguan, kabel listrik, siluet gedung, hand-drawn aesthetic, kontras warna hangat dan dingin, 8k, ala Makoto Shinkai" data-negative="3d render, cgi, kartun, flat, sederhana, jelek, aneh, blur, resolusi rendah">Stasiun Senja</div>
+                        <div class="preset-item" data-prompt="mahakarya, kualitas terbaik, sinematik, anime art style, pasangan jalan di bawah pohon musim gugur, daun berjatuhan, cahaya keemasan, taman kota detail, background fotorealistik, emosional, adegan film Makoto Shinkai, 8k" data-negative="3d render, cgi, kartun, flat, sederhana, jelek, aneh, blur, resolusi rendah">Musim Gugur</div>
                     </div>
                 </div>
 
                 <!-- Prompt -->
                 <div class="form-group">
-                    <label>Prompt</label>
-                    <textarea id="prompt" placeholder="Deskripsikan gambar yang ingin dibuat... Gunakan [karakter] untuk menyisipkan karakter custom" required></textarea>
-                    <div class="hint">Tips: Gunakan detail seperti pencahayaan, suasana, dan kualitas gambar. Kata kunci: cinematic lighting, photorealistic, 8k, masterpiece</div>
+                    <label>Prompt Lo</label>
+                    <textarea id="prompt" placeholder="Ceritain gambar impian lo di sini... Bisa kasih [karakter] biar makin personal" required></textarea>
+                    <div class="hint">Tips biar makin jos: tambahin kata kunci kayak "pencahayaan sinematik", "fotorealistik", "8k", "mahakarya". Jangan lupa detail suasana ya bestie!</div>
                 </div>
 
                 <!-- Negative Prompt -->
                 <div class="form-group">
-                    <label>Negative Prompt</label>
-                    <input type="text" id="negativePrompt" placeholder="Abaikan atau isi elemen yang tidak diinginkan">
+                    <label>Negative Prompt (skip aja kalo gapake)</label>
+                    <input type="text" id="negativePrompt" placeholder="Isi hal yg ga lo pengen muncul di gambar...">
                 </div>
 
                 <!-- Size -->
@@ -432,36 +471,42 @@
                     <label>Style</label>
                     <div class="option-list" id="styleList">
                         <div class="option-item active" data-value="">
-                            <span class="style-icon">A</span> Default
+                            <span class="style-icon">D</span> Default
                         </div>
                         <div class="option-item" data-value="cinematic">
-                            <span class="style-icon">C</span> Cinematic
+                            <span class="style-icon">C</span> Sinematik
                         </div>
                         <div class="option-item" data-value="realistic">
-                            <span class="style-icon">R</span> Realistic
-                        </div>
-                        <div class="option-item" data-value="ghibli">
-                            <span class="style-icon">G</span> Ghibli
+                            <span class="style-icon">R</span> Realistis
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-generate" id="btnGenerate">Generate Image</button>
+                <button type="submit" class="btn-generate" id="btnGenerate">Gaskeun Generate!</button>
             </form>
         </div>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Generating image...</p>
+            <p>Sabarr... Lagi masak gambar...</p>
         </div>
 
         <div class="error-message" id="errorMessage"></div>
 
         <div class="result-container" id="resultContainer"></div>
 
+        <!-- Saran Box -->
+        <div class="saran-card">
+            <div class="saran-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ecdc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+            </div>
+            <div class="saran-title">Ada saran atau request fitur baru?</div>
+            <button class="btn-saran" onclick="showSaranModal()">Kirim Saran ke Admin</button>
+        </div>
+
         <!-- Gallery -->
         <div class="gallery-tabs" id="galleryTabs" style="display:none;">
-            <button class="gallery-tab active" onclick="switchGallery('mine')">Galeri Saya</button>
+            <button class="gallery-tab active" onclick="switchGallery('mine')">Galeri Gue</button>
             <button class="gallery-tab" onclick="switchGallery('public')">Galeri Publik</button>
         </div>
         <div class="history-scroll" id="historyScroll"></div>
@@ -477,23 +522,36 @@
         <div class="auth-card">
             <div class="auth-title" id="authTitle">Login</div>
             <form id="authForm">
-                <input type="text" class="auth-input" id="authUsername" placeholder="Username" required>
+                <input type="text" class="auth-input" id="authUsername" placeholder="Username lo" required>
                 <div class="password-wrapper">
-                    <input type="password" class="auth-input" id="authPassword" placeholder="Password" required>
+                    <input type="password" class="auth-input" id="authPassword" placeholder="Password rahasia" required>
                     <button type="button" class="toggle-pw" onclick="togglePassword()" tabindex="-1">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
                 </div>
                 <div class="password-wrapper" id="confirmGroup" style="display:none;">
-                    <input type="password" class="auth-input" id="authConfirm" placeholder="Confirm password">
+                    <input type="password" class="auth-input" id="authConfirm" placeholder="Konfirm password">
                 </div>
-                <button type="submit" class="btn-generate" style="margin-top:10px;">Submit</button>
+                <button type="submit" class="btn-generate" style="margin-top:10px;">Gaskeun!</button>
             </form>
             <div class="auth-link">
                 <span id="authSwitchText">Belum punya akun?</span>
-                <a id="authSwitchLink" onclick="switchAuth()">Register</a>
+                <a id="authSwitchLink" onclick="switchAuth()">Daftar dulu</a>
             </div>
             <div class="error-message" id="authError"></div>
+        </div>
+    </div>
+
+    <!-- Saran Modal -->
+    <div class="saran-modal" id="saranModal">
+        <div class="saran-card-modal">
+            <div class="auth-title">Kirim Saran</div>
+            <form id="saranForm">
+                <input type="text" class="auth-input" id="saranNama" placeholder="Nama lo (opsional)">
+                <textarea class="auth-input" id="saranPesan" placeholder="Tulis saran, kritik, atau request fitur di sini..." style="min-height:100px;" required></textarea>
+                <button type="submit" class="btn-generate" style="margin-top:10px;">Kirim Saran</button>
+            </form>
+            <div class="error-message" id="saranError"></div>
         </div>
     </div>
 
@@ -510,6 +568,8 @@
         let usersDB = getDB('usersDB');
         let resultsDB = getDB('resultsDB');
         let publicDB = getDB('publicDB');
+        let saranDB = getDB('saranDB');
+        if (!Array.isArray(saranDB)) saranDB = [];
         let currentUser = getCookie('ai_user');
         let currentGallery = 'mine';
         let selectedSize = '1440x720';
@@ -517,53 +577,71 @@
 
         if (currentUser) { showLoggedIn(currentUser); document.getElementById('galleryTabs').style.display = 'flex'; renderGallery(); } else { renderPublicGallery(); }
 
+        // Preset
         document.querySelectorAll('.preset-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); document.getElementById('prompt').value = this.dataset.prompt; document.getElementById('negativePrompt').value = this.dataset.negative || ''; }); });
         document.querySelectorAll('#sizeList .option-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('#sizeList .option-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); selectedSize = this.dataset.value; }); });
         document.querySelectorAll('#styleList .option-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('#styleList .option-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); selectedStyle = this.dataset.value; }); });
 
         function showLoggedIn(u) { document.getElementById('userSection').innerHTML = `<span class="user-badge">@${u}</span><button class="btn btn-danger" onclick="logout()">Logout</button>`; }
-        function logout() { deleteCookie('ai_user'); currentUser = null; document.getElementById('userSection').innerHTML = '<button class="btn btn-primary" onclick="showAuthModal(\'login\')">Login</button>'; document.getElementById('galleryTabs').style.display = 'none'; renderPublicGallery(); showToast('Logged out'); }
-        function showAuthModal(type) { document.getElementById('authModal').classList.add('active'); document.getElementById('authError').classList.remove('active'); document.getElementById('authError').style.display = 'none'; document.getElementById('authForm').reset(); if (type === 'login') { document.getElementById('authTitle').textContent = 'Login'; document.getElementById('confirmGroup').style.display = 'none'; document.getElementById('authSwitchText').textContent = 'Belum punya akun? '; document.getElementById('authSwitchLink').textContent = 'Register'; document.getElementById('authForm').dataset.type = 'login'; } else { document.getElementById('authTitle').textContent = 'Register'; document.getElementById('confirmGroup').style.display = 'block'; document.getElementById('authSwitchText').textContent = 'Sudah punya akun? '; document.getElementById('authSwitchLink').textContent = 'Login'; document.getElementById('authForm').dataset.type = 'register'; } }
+        function logout() { deleteCookie('ai_user'); currentUser = null; document.getElementById('userSection').innerHTML = '<button class="btn btn-primary" onclick="showAuthModal(\'login\')">Login</button>'; document.getElementById('galleryTabs').style.display = 'none'; renderPublicGallery(); showToast('Logout berhasil!'); }
+        function showAuthModal(type) { document.getElementById('authModal').classList.add('active'); document.getElementById('authError').classList.remove('active'); document.getElementById('authError').style.display = 'none'; document.getElementById('authForm').reset(); if (type === 'login') { document.getElementById('authTitle').textContent = 'Login Dulu Yuk'; document.getElementById('confirmGroup').style.display = 'none'; document.getElementById('authSwitchText').textContent = 'Belum punya akun? '; document.getElementById('authSwitchLink').textContent = 'Daftar dulu'; document.getElementById('authForm').dataset.type = 'login'; } else { document.getElementById('authTitle').textContent = 'Daftar Akun Baru'; document.getElementById('confirmGroup').style.display = 'block'; document.getElementById('authSwitchText').textContent = 'Udah punya akun? '; document.getElementById('authSwitchLink').textContent = 'Login aja'; document.getElementById('authForm').dataset.type = 'register'; } }
         function switchAuth() { const t = document.getElementById('authForm').dataset.type; showAuthModal(t === 'login' ? 'register' : 'login'); }
         function togglePassword() { const pw = document.getElementById('authPassword'); const cf = document.getElementById('authConfirm'); pw.type = pw.type === 'password' ? 'text' : 'password'; if (cf) cf.type = cf.type === 'password' ? 'text' : 'password'; }
 
         document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault(); const type = this.dataset.type; const u = document.getElementById('authUsername').value.trim(); const p = document.getElementById('authPassword').value.trim(); const c = document.getElementById('authConfirm').value.trim(); const ae = document.getElementById('authError'); ae.classList.remove('active'); ae.style.display = 'none';
-            if (!u || !p) return showAuthError('Semua field harus diisi!'); if (u.length < 3) return showAuthError('Username minimal 3 karakter!'); if (p.length < 4) return showAuthError('Password minimal 4 karakter!');
+            if (!u || !p) return showAuthError('Isi semua field dong!'); if (u.length < 3) return showAuthError('Username minimal 3 karakter ya!'); if (p.length < 4) return showAuthError('Password minimal 4 karakter!');
             usersDB = getDB('usersDB');
-            if (type === 'register') { if (p !== c) return showAuthError('Password tidak cocok!'); if (usersDB[u]) return showAuthError('Username sudah terdaftar!'); usersDB[u] = { password: p, created: new Date().toISOString() }; setDB('usersDB', usersDB); setCookie('ai_user', u); currentUser = u; finishAuth('Registrasi berhasil!'); }
+            if (type === 'register') { if (p !== c) return showAuthError('Password ga cocok!'); if (usersDB[u]) return showAuthError('Username udah dipake orang!'); usersDB[u] = { password: p, created: new Date().toISOString() }; setDB('usersDB', usersDB); setCookie('ai_user', u); currentUser = u; finishAuth('Akun berhasil dibuat!'); }
             else { if (!usersDB[u] || usersDB[u].password !== p) return showAuthError('Username atau password salah!'); setCookie('ai_user', u); currentUser = u; finishAuth('Login berhasil!'); }
         });
         function finishAuth(msg) { showLoggedIn(currentUser); document.getElementById('authModal').classList.remove('active'); document.getElementById('galleryTabs').style.display = 'flex'; currentGallery = 'mine'; document.querySelectorAll('.gallery-tab').forEach((t, i) => t.classList.toggle('active', i === 0)); renderGallery(); showToast(msg); }
         function showAuthError(msg) { const ae = document.getElementById('authError'); ae.textContent = msg; ae.classList.add('active'); ae.style.display = 'block'; }
         document.getElementById('authModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
 
+        // Saran
+        function showSaranModal() { document.getElementById('saranModal').classList.add('active'); document.getElementById('saranError').classList.remove('active'); document.getElementById('saranError').style.display = 'none'; document.getElementById('saranForm').reset(); }
+        document.getElementById('saranModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+        document.getElementById('saranForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nama = document.getElementById('saranNama').value.trim() || 'Anonim';
+            const pesan = document.getElementById('saranPesan').value.trim();
+            const se = document.getElementById('saranError');
+            if (!pesan) { se.textContent = 'Isi pesannya dulu dong!'; se.classList.add('active'); se.style.display = 'block'; return; }
+            saranDB = getDB('saranDB');
+            if (!Array.isArray(saranDB)) saranDB = [];
+            saranDB.push({ nama, pesan, timestamp: new Date().toISOString() });
+            setDB('saranDB', saranDB);
+            document.getElementById('saranModal').classList.remove('active');
+            showToast('Saran terkirim! Makasih ya bestie!');
+        });
+
         document.getElementById('generateForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); if (!currentUser) { showToast('Silakan login dulu!', true); showAuthModal('login'); return; }
+            e.preventDefault(); if (!currentUser) { showToast('Login dulu ya bestie!', true); showAuthModal('login'); return; }
             const prompt = document.getElementById('prompt').value.trim(); const negativePrompt = document.getElementById('negativePrompt').value.trim(); const btnGenerate = document.getElementById('btnGenerate'); const loading = document.getElementById('loading'); const errorMessage = document.getElementById('errorMessage'); const resultContainer = document.getElementById('resultContainer');
             errorMessage.classList.remove('active'); resultContainer.innerHTML = '';
-            if (!prompt) { showError('Prompt tidak boleh kosong!'); return; }
-            const stylePrefixes = { cinematic: 'masterpiece, best quality, cinematic lighting, anime art style, hand-drawn aesthetic, Makoto Shinkai style, photorealistic background, highly detailed, 8k, ', realistic: 'masterpiece, best quality, ultra realistic, photorealistic, highly detailed, 8k, national geographic, ', ghibli: 'masterpiece, best quality, Studio Ghibli art style, hand-drawn animation, soft pastel colors, dreamy atmosphere, highly detailed, ', '': '' };
+            if (!prompt) { showError('Prompt gaboleh kosong!'); return; }
+            const stylePrefixes = { cinematic: 'mahakarya, kualitas terbaik, pencahayaan sinematik, anime art style, hand-drawn aesthetic, ala Makoto Shinkai, background fotorealistik, sangat detail, 8k, ', realistic: 'mahakarya, kualitas terbaik, ultra realistis, fotorealistik, sangat detail, 8k, national geographic, ', '': '' };
             const finalPrompt = (stylePrefixes[selectedStyle] || '') + prompt;
-            loading.classList.add('active'); btnGenerate.disabled = true; btnGenerate.textContent = 'Generating...';
+            loading.classList.add('active'); btnGenerate.disabled = true; btnGenerate.textContent = 'Memasak...';
             try {
                 const response = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: finalPrompt, negativePrompt, size: selectedSize, jumlah: 1, username: currentUser }) });
                 const data = await response.json();
                 if (data.success && data.images && data.images.length > 0) { const img = data.images[0]; resultContainer.innerHTML = `<div class="result-wrapper"><img src="${img.url}" alt="Generated" class="result-image" onclick="openPreview('${img.url}')" loading="lazy"><span class="result-user">@${currentUser}</span></div>`; resultsDB = getDB('resultsDB'); if (!resultsDB[currentUser]) resultsDB[currentUser] = []; resultsDB[currentUser].unshift({ url: img.url, prompt: finalPrompt, size: selectedSize, timestamp: new Date().toISOString(), public: false }); if (resultsDB[currentUser].length > 50) resultsDB[currentUser] = resultsDB[currentUser].slice(0, 50); setDB('resultsDB', resultsDB); renderGallery(); showToast('Gambar berhasil dibuat!'); }
                 else { showError(data.message || 'Gagal generate gambar'); }
-            } catch (error) { showError('Network error, silakan coba lagi'); }
-            finally { loading.classList.remove('active'); btnGenerate.disabled = false; btnGenerate.textContent = 'Generate Image'; }
+            } catch (error) { showError('Network error, coba lagi ya!'); }
+            finally { loading.classList.remove('active'); btnGenerate.disabled = false; btnGenerate.textContent = 'Gaskeun Generate!'; }
         });
 
         function switchGallery(type) { currentGallery = type; document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderGallery(); }
-        function renderGallery() { if (!currentUser) return renderPublicGallery(); resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const c = document.getElementById('historyScroll'); let items = currentGallery === 'mine' ? (resultsDB[currentUser] || []).map(r => ({ ...r, user: currentUser })) : Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); c.innerHTML = items.length === 0 ? '<p style="color:#888;padding:20px;">Belum ada gambar</p>' : items.map((r, i) => `<div class="history-card"><img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy"><div class="card-info"><div class="card-user">@${r.user}</div><div class="card-prompt">${escapeHtml(r.prompt || '')}</div><div class="card-actions"><button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button><button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button>${currentGallery === 'mine' ? `<button class="btn-sm btn-sm-pub" onclick="event.stopPropagation();togglePublic('${currentUser}', ${i})">${r.public ? 'Unpub' : 'Pub'}</button><button class="btn-sm btn-sm-del" onclick="event.stopPropagation();deleteMyImage(${i})">X</button>` : ''}</div></div></div>`).join(''); }
-        function renderPublicGallery() { publicDB = getDB('publicDB'); const c = document.getElementById('historyScroll'); let items = Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); c.innerHTML = items.length === 0 ? '<p style="color:#888;padding:20px;">Belum ada gambar publik</p>' : items.map(r => `<div class="history-card"><img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy"><div class="card-info"><div class="card-user">@${r.user}</div><div class="card-prompt">${escapeHtml(r.prompt || '')}</div><div class="card-actions"><button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button><button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button></div></div></div>`).join(''); }
-        function togglePublic(user, idx) { resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const item = resultsDB[user][idx]; item.public = !item.public; resultsDB[user][idx] = item; setDB('resultsDB', resultsDB); if (item.public) { if (!publicDB[user]) publicDB[user] = []; publicDB[user].push(item); } else { if (publicDB[user]) publicDB[user] = publicDB[user].filter(p => p.url !== item.url); } setDB('publicDB', publicDB); renderGallery(); showToast(item.public ? 'Dipublikasikan!' : 'Diunpublish'); }
-        function deleteMyImage(idx) { if (!confirm('Hapus gambar ini?')) return; resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const item = resultsDB[currentUser][idx]; resultsDB[currentUser].splice(idx, 1); setDB('resultsDB', resultsDB); if (publicDB[currentUser]) { publicDB[currentUser] = publicDB[currentUser].filter(p => p.url !== item.url); setDB('publicDB', publicDB); } renderGallery(); showToast('Gambar dihapus'); }
+        function renderGallery() { if (!currentUser) return renderPublicGallery(); resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const c = document.getElementById('historyScroll'); let items = currentGallery === 'mine' ? (resultsDB[currentUser] || []).map(r => ({ ...r, user: currentUser })) : Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); c.innerHTML = items.length === 0 ? '<p style="color:#888;padding:20px;">Belum ada gambar nih...</p>' : items.map((r, i) => `<div class="history-card"><img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy"><div class="card-info"><div class="card-user">@${r.user}</div><div class="card-prompt">${escapeHtml(r.prompt || '')}</div><div class="card-actions"><button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button><button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button>${currentGallery === 'mine' ? `<button class="btn-sm btn-sm-pub" onclick="event.stopPropagation();togglePublic('${currentUser}', ${i})">${r.public ? 'Unpub' : 'Pub'}</button><button class="btn-sm btn-sm-del" onclick="event.stopPropagation();deleteMyImage(${i})">X</button>` : ''}</div></div></div>`).join(''); }
+        function renderPublicGallery() { publicDB = getDB('publicDB'); const c = document.getElementById('historyScroll'); let items = Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); c.innerHTML = items.length === 0 ? '<p style="color:#888;padding:20px;">Belum ada gambar publik...</p>' : items.map(r => `<div class="history-card"><img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy"><div class="card-info"><div class="card-user">@${r.user}</div><div class="card-prompt">${escapeHtml(r.prompt || '')}</div><div class="card-actions"><button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button><button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button></div></div></div>`).join(''); }
+        function togglePublic(user, idx) { resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const item = resultsDB[user][idx]; item.public = !item.public; resultsDB[user][idx] = item; setDB('resultsDB', resultsDB); if (item.public) { if (!publicDB[user]) publicDB[user] = []; publicDB[user].push(item); } else { if (publicDB[user]) publicDB[user] = publicDB[user].filter(p => p.url !== item.url); } setDB('publicDB', publicDB); renderGallery(); showToast(item.public ? 'Dipublikasiin!' : 'Di-unpublish'); }
+        function deleteMyImage(idx) { if (!confirm('Yakin hapus gambar ini?')) return; resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const item = resultsDB[currentUser][idx]; resultsDB[currentUser].splice(idx, 1); setDB('resultsDB', resultsDB); if (publicDB[currentUser]) { publicDB[currentUser] = publicDB[currentUser].filter(p => p.url !== item.url); setDB('publicDB', publicDB); } renderGallery(); showToast('Gambar dihapus!'); }
 
         function openPreview(url) { document.getElementById('previewImage').src = url; document.getElementById('previewModal').classList.add('active'); }
         document.getElementById('previewModal').addEventListener('click', function() { this.classList.remove('active'); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { document.getElementById('previewModal').classList.remove('active'); document.getElementById('authModal').classList.remove('active'); } });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { document.getElementById('previewModal').classList.remove('active'); document.getElementById('authModal').classList.remove('active'); document.getElementById('saranModal').classList.remove('active'); } });
         async function downloadImage(url) { try { const r = await fetch(url); const b = await r.blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `image_${Date.now()}.jpg`; a.click(); URL.revokeObjectURL(a.href); showToast('Download dimulai!'); } catch(e) { window.open(url, '_blank'); } }
         function copyText(t) { navigator.clipboard.writeText(t).then(() => showToast('Copied!')).catch(() => showToast('Gagal copy')); }
         function showError(msg) { const el = document.getElementById('errorMessage'); el.textContent = msg; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), 5000); }
