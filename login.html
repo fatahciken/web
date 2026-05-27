@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AI Image Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 400px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-login:hover {
+            transform: scale(1.02);
+        }
+        .error-message {
+            background: rgba(255,107,107,0.1);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+        .error-message.active {
+            display: block;
+        }
+        .info-text {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>Login</h1>
+        <p class="subtitle">AI Image Generator</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Masukkan username" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Masukkan password" required>
+            </div>
+            
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+        
+        <div class="error-message" id="errorMessage"></div>
+        <p class="info-text">Default: admin / admin123</p>
+    </div>
+
+    <script>
+        // User database lokal
+        const users = {
+            'admin': {
+                password: 'admin123',
+                role: 'admin',
+                name: 'Administrator'
+            },
+            'user': {
+                password: 'user123',
+                role: 'user',
+                name: 'User Biasa'
+            }
+        };
+
+        // Cek apakah sudah login
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (userData && userData.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            
+            errorMessage.classList.remove('active');
+            
+            if (!username || !password) {
+                errorMessage.textContent = 'Username dan password harus diisi!';
+                errorMessage.classList.add('active');
+                return;
+            }
+            
+            // Cek user
+            if (users[username] && users[username].password === password) {
+                // Login berhasil
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userData', JSON.stringify({
+                    username: username,
+                    role: users[username].role,
+                    name: users[username].name
+                }));
+                
+                // Redirect sesuai role
+                if (users[username].role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                errorMessage.textContent = 'Username atau password salah!';
+                errorMessage.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
