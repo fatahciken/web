@@ -229,6 +229,20 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        .clear-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        .clear-btn:hover {
+            background: #ff5252;
+        }
     </style>
 </head>
 <body>
@@ -236,7 +250,6 @@
         <h1>AI Image Generator</h1>
         <p class="subtitle">Generate anime and realistic images instantly</p>
 
-        <!-- Form Card -->
         <div class="form-card">
             <form id="generateForm">
                 <div class="form-group">
@@ -277,49 +290,33 @@
             </form>
         </div>
 
-        <!-- Loading -->
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Generating image...</p>
+            <p>Generating image, please wait...</p>
         </div>
 
-        <!-- Error Message -->
         <div class="error-message" id="errorMessage"></div>
 
-        <!-- Results -->
         <div class="results-title" id="resultsTitle">Hasil Generate</div>
         <div class="results" id="results"></div>
 
-        <!-- History -->
+        <button class="clear-btn" onclick="clearHistory()">Clear History</button>
         <div class="history-title">Riwayat Generate</div>
         <div class="history-grid" id="historyGrid"></div>
     </div>
 
     <script>
-        // Constants
-        const API_URL = 'https://lkpmzvrveyocaodaixss.supabase.co/functions/v1/images-runware';
-        const DEVICE_ID = 'a19b0923-75c9-48f7-a4b2-c599f54bd30c';
-        const AUTH_TOKEN = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcG16dnJ2ZXlvY2FvZGFpeHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MjIyMjAsImV4cCI6MjA3MzE5ODIyMH0.3JYpifirgKd_UjMz5oAgVDa8Q1YiPxr2ONmbheFTnZQ';
-
-        // Global history array
         let history = [];
 
-        // Load history from localStorage
         if (localStorage.getItem('imageHistory')) {
-            history = JSON.parse(localStorage.getItem('imageHistory'));
+            try {
+                history = JSON.parse(localStorage.getItem('imageHistory'));
+            } catch(e) {
+                history = [];
+            }
             renderHistory();
         }
 
-        // Generate UUID
-        function generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-
-        // Form submit handler
         document.getElementById('generateForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -333,7 +330,6 @@
             const results = document.getElementById('results');
             const resultsTitle = document.getElementById('resultsTitle');
 
-            // Reset
             errorMessage.classList.remove('active');
             errorMessage.textContent = '';
             results.innerHTML = '';
@@ -344,56 +340,42 @@
                 return;
             }
 
-            // Show loading
             loading.classList.add('active');
             btnGenerate.disabled = true;
             btnGenerate.textContent = 'Generating...';
 
             try {
-                const payload = {
-                    prompt: prompt,
-                    model: 'runware-flux-schnell',
-                    size: size,
-                    negativePrompt: negativePrompt,
-                    n: jumlah,
-                    mode: 'text2img',
-                    strength: 1,
-                    outputType: 'URL',
-                    outputFormat: 'JPG',
-                    outputQuality: 95,
-                    includeCost: false,
-                    deviceId: DEVICE_ID,
-                    jobId: generateUUID()
-                };
-
-                const response = await fetch(API_URL, {
+                const response = await fetch('/api/generate', {
                     method: 'POST',
                     headers: {
-                        'User-Agent': 'okhttp/4.12.0',
-                        'Accept-Encoding': 'gzip',
-                        'Content-Type': 'application/json',
-                        'x-device-id': DEVICE_ID,
-                        'x-client-id': DEVICE_ID,
-                        'authorization': AUTH_TOKEN,
-                        'apikey': AUTH_TOKEN.replace('Bearer ', '')
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        negativePrompt: negativePrompt,
+                        size: size,
+                        jumlah: jumlah
+                    })
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
 
                 const data = await response.json();
 
-                if (data.status === 'done' && data.images && data.images.length > 0) {
-                    // Render results
+                if (data.success && data.images && data.images.length > 0) {
                     resultsTitle.classList.add('active');
+                    
                     data.images.forEach((img, index) => {
-                        const card = createImageCard(img, prompt, size, index + 1);
+                        const card = document.createElement('div');
+                        card.className = 'image-card';
+                        card.innerHTML = `
+                            <img src="${img.url}" alt="Generated Image ${index + 1}" loading="lazy">
+                            <div class="image-info">
+                                <div class="image-prompt">${escapeHtml(prompt)}</div>
+                                <div class="image-size">Image ${index + 1} | ${size}</div>
+                                <button class="btn-download" onclick="downloadImage('${img.url}', 'image_${index + 1}_${Date.now()}.jpg')">Download</button>
+                            </div>
+                        `;
                         results.appendChild(card);
 
-                        // Add to history
                         history.unshift({
                             url: img.url,
                             prompt: prompt,
@@ -402,19 +384,18 @@
                         });
                     });
 
-                    // Save to localStorage (max 20 items)
-                    if (history.length > 20) {
-                        history = history.slice(0, 20);
+                    if (history.length > 50) {
+                        history = history.slice(0, 50);
                     }
                     localStorage.setItem('imageHistory', JSON.stringify(history));
                     renderHistory();
 
                 } else {
-                    throw new Error(data.message || 'Gagal generate gambar');
+                    showError(data.message || 'Gagal generate gambar');
                 }
 
             } catch (error) {
-                showError('Error: ' + error.message);
+                showError('Network error, silakan coba lagi');
             } finally {
                 loading.classList.remove('active');
                 btnGenerate.disabled = false;
@@ -422,22 +403,6 @@
             }
         });
 
-        // Create image card
-        function createImageCard(img, prompt, size, index) {
-            const card = document.createElement('div');
-            card.className = 'image-card';
-            card.innerHTML = `
-                <img src="${img.url}" alt="Generated Image ${index}" loading="lazy">
-                <div class="image-info">
-                    <div class="image-prompt">${escapeHtml(prompt)}</div>
-                    <div class="image-size">Image ${index} | ${size}</div>
-                    <button class="btn-download" onclick="downloadImage('${img.url}', 'image_${index}_${Date.now()}.jpg')">Download</button>
-                </div>
-            `;
-            return card;
-        }
-
-        // Download image function
         async function downloadImage(url, filename) {
             try {
                 const response = await fetch(url);
@@ -445,14 +410,15 @@
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = filename;
+                document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
             } catch (error) {
                 window.open(url, '_blank');
             }
         }
 
-        // Show error
         function showError(message) {
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.textContent = message;
@@ -462,20 +428,26 @@
             }, 5000);
         }
 
-        // Escape HTML
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        // Render history
+        function clearHistory() {
+            if (confirm('Hapus semua riwayat?')) {
+                history = [];
+                localStorage.removeItem('imageHistory');
+                renderHistory();
+            }
+        }
+
         function renderHistory() {
             const historyGrid = document.getElementById('historyGrid');
             historyGrid.innerHTML = '';
 
             if (history.length === 0) {
-                historyGrid.innerHTML = '<p style="color:#888;">Belum ada riwayat generate</p>';
+                historyGrid.innerHTML = '<p style="color:#888;grid-column:1/-1;">Belum ada riwayat</p>';
                 return;
             }
 
