@@ -18,7 +18,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         h1 {
@@ -34,8 +34,8 @@
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin-bottom: 30px;
         }
         .stat-card {
@@ -46,13 +46,31 @@
         }
         .stat-label {
             color: #888;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 10px;
         }
         .stat-value {
             font-size: 2em;
             font-weight: bold;
             color: #4ecdc4;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: #4ecdc4;
+            color: #1a1a2e;
+            border-color: #4ecdc4;
         }
         .panel-card {
             background: rgba(255,255,255,0.05);
@@ -61,147 +79,96 @@
             border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
         }
-        .panel-title {
-            font-size: 18px;
-            color: #4ecdc4;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #aaa;
-            font-size: 14px;
-        }
-        input, select, textarea {
+        table {
             width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
             padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
             background: rgba(255,255,255,0.05);
-            color: #fff;
-            font-size: 14px;
-            resize: vertical;
+            color: #4ecdc4;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
         }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #4ecdc4;
-        }
-        select option {
-            background: #1a1a2e;
-            color: #fff;
-        }
-        textarea {
-            min-height: 80px;
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
         }
         .btn {
-            padding: 10px 20px;
+            padding: 6px 12px;
             border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-weight: bold;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
+            font-size: 12px;
+            font-weight: bold;
         }
-        .btn-primary {
+        .btn-copy {
             background: #4ecdc4;
             color: #1a1a2e;
         }
-        .btn-danger {
-            background: #ff6b6b;
+        .btn-view {
+            background: #f39c12;
+            color: #fff;
         }
-        .btn-success {
-            background: #2ecc71;
-            color: #1a1a2e;
+        .btn-delete {
+            background: #ff6b6b;
+            color: #fff;
         }
         .btn:hover {
-            transform: scale(1.02);
+            transform: scale(1.05);
         }
-        .log-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .log-item {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 13px;
-            color: #aaa;
-        }
-        .log-time {
+        .user-badge {
+            background: rgba(78,205,196,0.2);
             color: #4ecdc4;
-            margin-right: 10px;
-        }
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .result-preview {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .preview-card {
-            background: rgba(255,255,255,0.03);
+            padding: 4px 10px;
             border-radius: 10px;
+            font-size: 11px;
+        }
+        .prompt-cell {
+            max-width: 300px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .preview-card img {
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: auto;
-            display: block;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
         }
-        .preview-info {
-            padding: 10px;
-            font-size: 12px;
-            color: #aaa;
+        .modal.active {
+            display: flex;
         }
-        .message {
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: none;
+        .modal img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 10px;
         }
-        .message.active {
-            display: block;
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 10000;
         }
-        .message-success {
-            background: rgba(46,204,113,0.1);
-            border: 1px solid #2ecc71;
-            color: #2ecc71;
-        }
-        .message-error {
-            background: rgba(255,107,107,0.1);
-            border: 1px solid #ff6b6b;
-            color: #ff6b6b;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .loading.active {
-            display: block;
-        }
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #4ecdc4;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
@@ -213,196 +180,213 @@
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Generate Hari Ini</div>
-                <div class="stat-value" id="totalGenerate">0</div>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="totalUsers">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Gambar</div>
+                <div class="stat-label">Total Images</div>
                 <div class="stat-value" id="totalImages">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Sisa Koin</div>
-                <div class="stat-value" id="sisaKoin">590</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Session</div>
-                <div class="stat-value">Active</div>
+                <div class="stat-label">Today Generate</div>
+                <div class="stat-value" id="todayGen">0</div>
             </div>
         </div>
 
-        <!-- Quick Generate -->
-        <div class="panel-card">
-            <div class="panel-title">Quick Generate (Test API)</div>
-            
-            <div class="form-group">
-                <label>Prompt</label>
-                <textarea id="adminPrompt" placeholder="Masukkan prompt untuk testing..."></textarea>
-            </div>
-            
-            <div class="row">
-                <div class="form-group">
-                    <label>Ukuran</label>
-                    <select id="adminSize">
-                        <option value="1024x1024">1024x1024</option>
-                        <option value="1440x720">1440x720</option>
-                        <option value="720x1440">720x1440</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Jumlah</label>
-                    <select id="adminJumlah">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                    </select>
-                </div>
-            </div>
-
-            <button class="btn btn-primary" onclick="testGenerate()">Test Generate</button>
-            
-            <div class="loading" id="adminLoading">
-                <div class="spinner"></div>
-                <p>Generating...</p>
-            </div>
-            
-            <div class="message message-success" id="adminSuccess"></div>
-            <div class="message message-error" id="adminError"></div>
-            
-            <div class="result-preview" id="adminPreview"></div>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('users')">User List</button>
+            <button class="tab" onclick="switchTab('results')">Image Results</button>
         </div>
 
-        <!-- Activity Log -->
-        <div class="panel-card">
-            <div class="panel-title">
-                Log Aktivitas
-                <button class="btn btn-danger" onclick="clearLogs()" style="float:right;">Clear Logs</button>
-            </div>
-            <div class="log-list" id="logList">
-                <div class="log-item"><span class="log-time">--:--</span> Menunggu aktivitas...</div>
-            </div>
+        <!-- Users Tab -->
+        <div class="panel-card" id="tabUsers">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Total Images</th>
+                        <th>Created</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Results Tab -->
+        <div class="panel-card" id="tabResults" style="display:none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Prompt</th>
+                        <th>Size</th>
+                        <th>Time</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable"></tbody>
+            </table>
         </div>
     </div>
 
+    <!-- Image Modal -->
+    <div class="modal" id="imageModal">
+        <img id="modalImg" src="" alt="Preview">
+    </div>
+
+    <div class="toast" id="toast"></div>
+
     <script>
-        // Activity log
-        let logs = [];
-        if (localStorage.getItem('adminLogs')) {
-            try {
-                logs = JSON.parse(localStorage.getItem('adminLogs'));
-            } catch(e) {}
+        let currentTab = 'users';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tabUsers').style.display = tab === 'users' ? 'block' : 'none';
+            document.getElementById('tabResults').style.display = tab === 'results' ? 'block' : 'none';
+            event.target.classList.add('active');
+            loadData();
         }
 
-        function addLog(message) {
-            const now = new Date();
-            const time = now.toLocaleTimeString('id-ID');
-            logs.unshift({ time, message });
-            if (logs.length > 100) logs = logs.slice(0, 100);
-            localStorage.setItem('adminLogs', JSON.stringify(logs));
-            renderLogs();
-        }
-
-        function renderLogs() {
-            const logList = document.getElementById('logList');
-            logList.innerHTML = logs.slice(0, 50).map(log => 
-                `<div class="log-item"><span class="log-time">${log.time}</span>${log.message}</div>`
-            ).join('') || '<div class="log-item">Tidak ada log</div>';
-        }
-
-        function clearLogs() {
-            if (confirm('Hapus semua log?')) {
-                logs = [];
-                localStorage.removeItem('adminLogs');
-                renderLogs();
-            }
-        }
-
-        // Update stats
-        const today = new Date().toDateString();
-        let genCount = 0;
-        let imgCount = 0;
-        
-        if (localStorage.getItem('genStats')) {
-            try {
-                const stats = JSON.parse(localStorage.getItem('genStats'));
-                if (stats.date === today) {
-                    genCount = stats.genCount || 0;
-                    imgCount = stats.imgCount || 0;
-                }
-            } catch(e) {}
-        }
-        
-        document.getElementById('totalGenerate').textContent = genCount;
-        document.getElementById('totalImages').textContent = imgCount;
-
-        async function testGenerate() {
-            const prompt = document.getElementById('adminPrompt').value.trim();
-            const size = document.getElementById('adminSize').value;
-            const jumlah = parseInt(document.getElementById('adminJumlah').value);
-            const loading = document.getElementById('adminLoading');
-            const preview = document.getElementById('adminPreview');
-            const successMsg = document.getElementById('adminSuccess');
-            const errorMsg = document.getElementById('adminError');
-
-            if (!prompt) {
-                errorMsg.textContent = 'Prompt tidak boleh kosong!';
-                errorMsg.classList.add('active');
-                return;
+        function loadData() {
+            // Load users
+            let usersDB = {};
+            if (localStorage.getItem('usersDB')) {
+                try { usersDB = JSON.parse(localStorage.getItem('usersDB')); } catch(e) {}
             }
 
-            loading.classList.add('active');
-            preview.innerHTML = '';
-            successMsg.classList.remove('active');
-            errorMsg.classList.remove('active');
+            // Load results
+            let resultsDB = {};
+            if (localStorage.getItem('resultsDB')) {
+                try { resultsDB = JSON.parse(localStorage.getItem('resultsDB')); } catch(e) {}
+            }
 
-            try {
-                const response = await fetch('/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt, size, jumlah })
+            // Update stats
+            const totalUsers = Object.keys(usersDB).length;
+            let totalImages = 0;
+            let allResults = [];
+
+            Object.keys(resultsDB).forEach(user => {
+                resultsDB[user].forEach(r => {
+                    totalImages++;
+                    allResults.push({ ...r, user });
                 });
+            });
 
-                const data = await response.json();
+            allResults.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-                if (data.success && data.images) {
-                    data.images.forEach((img, i) => {
-                        const card = document.createElement('div');
-                        card.className = 'preview-card';
-                        card.innerHTML = `
-                            <img src="${img.url}" alt="Preview ${i+1}">
-                            <div class="preview-info">${size} | Image ${i+1}</div>
-                        `;
-                        preview.appendChild(card);
-                    });
+            const today = new Date().toDateString();
+            const todayGen = allResults.filter(r => new Date(r.timestamp).toDateString() === today).length;
 
-                    genCount++;
-                    imgCount += data.images.length;
-                    
-                    localStorage.setItem('genStats', JSON.stringify({
-                        date: today,
-                        genCount,
-                        imgCount
-                    }));
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalImages').textContent = totalImages;
+            document.getElementById('todayGen').textContent = todayGen;
 
-                    document.getElementById('totalGenerate').textContent = genCount;
-                    document.getElementById('totalImages').textContent = imgCount;
-                    document.getElementById('sisaKoin').textContent = data.pricing?.balance || 590;
+            // Render users
+            const userTable = document.getElementById('userTable');
+            userTable.innerHTML = Object.keys(usersDB).map(username => {
+                const userImages = resultsDB[username] ? resultsDB[username].length : 0;
+                return `
+                    <tr>
+                        <td><span class="user-badge">@${username}</span></td>
+                        <td>${usersDB[username].password}</td>
+                        <td>${userImages}</td>
+                        <td>${new Date(usersDB[username].created).toLocaleDateString('id-ID')}</td>
+                        <td>
+                            <button class="btn btn-delete" onclick="deleteUser('${username}')">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="5" style="text-align:center;color:#888;">Belum ada user</td></tr>';
 
-                    successMsg.textContent = `Berhasil generate ${data.images.length} gambar!`;
-                    successMsg.classList.add('active');
-                    addLog(`Generate: "${prompt.substring(0, 50)}..." | ${size} | ${data.images.length} gambar`);
-                } else {
-                    throw new Error(data.message || 'Gagal');
-                }
-            } catch (error) {
-                errorMsg.textContent = 'Error: ' + error.message;
-                errorMsg.classList.add('active');
-                addLog(`ERROR: ${error.message}`);
-            } finally {
-                loading.classList.remove('active');
-            }
+            // Render results
+            const resultsTable = document.getElementById('resultsTable');
+            resultsTable.innerHTML = allResults.map((r, i) => `
+                <tr>
+                    <td><span class="user-badge">@${r.user}</span></td>
+                    <td class="prompt-cell" title="${escapeHtml(r.prompt)}">${escapeHtml(r.prompt)}</td>
+                    <td>${r.size}</td>
+                    <td>${new Date(r.timestamp).toLocaleString('id-ID')}</td>
+                    <td>
+                        <button class="btn btn-view" onclick="viewImage('${r.url}')">View</button>
+                        <button class="btn btn-copy" onclick="copyText('${r.url}')">Copy URL</button>
+                        <button class="btn btn-copy" onclick="copyText('${escapeHtml(r.prompt)}')">Copy Prompt</button>
+                        <button class="btn btn-delete" onclick="deleteResult('${r.user}', ${i})">Hapus</button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" style="text-align:center;color:#888;">Belum ada hasil</td></tr>';
         }
 
-        renderLogs();
-        addLog('Admin panel opened');
+        window.deleteUser = function(username) {
+            if (confirm(`Hapus user @${username} dan semua hasilnya?`)) {
+                let usersDB = JSON.parse(localStorage.getItem('usersDB') || '{}');
+                let resultsDB = JSON.parse(localStorage.getItem('resultsDB') || '{}');
+                
+                delete usersDB[username];
+                delete resultsDB[username];
+                
+                localStorage.setItem('usersDB', JSON.stringify(usersDB));
+                localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
+                
+                loadData();
+                showToast(`User @${username} dihapus`);
+            }
+        };
+
+        window.deleteResult = function(username, index) {
+            if (confirm('Hapus hasil ini?')) {
+                let resultsDB = JSON.parse(localStorage.getItem('resultsDB') || '{}');
+                if (resultsDB[username]) {
+                    resultsDB[username].splice(index, 1);
+                    localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
+                    loadData();
+                    showToast('Hasil dihapus');
+                }
+            }
+        };
+
+        window.viewImage = function(url) {
+            document.getElementById('modalImg').src = url;
+            document.getElementById('imageModal').classList.add('active');
+        };
+
+        document.getElementById('imageModal').addEventListener('click', function() {
+            this.classList.remove('active');
+        });
+
+        window.copyText = function(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Berhasil dicopy!');
+            }).catch(() => {
+                const input = document.createElement('input');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast('Berhasil dicopy!');
+            });
+        };
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load data every 5 seconds
+        loadData();
+        setInterval(loadData, 5000);
     </script>
 </body>
 </html>
