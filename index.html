@@ -23,29 +23,32 @@
             align-items: center;
             max-width: 800px;
             margin: 0 auto 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .user-section {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
         .user-badge {
             background: rgba(78,205,196,0.2);
             color: #4ecdc4;
             padding: 8px 15px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
         }
         .btn {
-            padding: 8px 20px;
+            padding: 8px 16px;
             border: none;
             border-radius: 8px;
             color: #fff;
             font-weight: bold;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: transform 0.2s;
+            white-space: nowrap;
         }
         .btn:hover {
             transform: scale(1.05);
@@ -57,13 +60,18 @@
         .btn-danger {
             background: #ff6b6b;
         }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #4ecdc4;
+            color: #4ecdc4;
+        }
         .container {
             max-width: 800px;
             margin: 0 auto;
         }
         h1 {
             text-align: center;
-            font-size: 2.5em;
+            font-size: 2.2em;
             margin-bottom: 5px;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             -webkit-background-clip: text;
@@ -72,7 +80,7 @@
         .subtitle {
             text-align: center;
             color: #888;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-size: 14px;
         }
         .form-card {
@@ -81,10 +89,10 @@
             padding: 25px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         label {
             display: block;
@@ -93,34 +101,51 @@
             font-weight: bold;
             font-size: 13px;
         }
-        textarea, input {
+        textarea {
             width: 100%;
-            padding: 12px 15px;
+            padding: 14px;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.2);
             background: rgba(255,255,255,0.05);
             color: #fff;
             font-size: 14px;
             resize: vertical;
-        }
-        textarea {
             min-height: 70px;
+            line-height: 1.5;
         }
-        textarea:focus, input:focus {
+        textarea:focus {
             outline: none;
             border-color: #4ecdc4;
+        }
+        select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        select option {
+            background: #1a1a2e;
+            color: #fff;
         }
         .preset-list {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .preset-item {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 8px;
-            padding: 10px 12px;
+            border-radius: 10px;
+            padding: 12px;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 12px;
@@ -153,11 +178,11 @@
         .row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 15px;
         }
         .btn-generate {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             border: none;
             border-radius: 10px;
@@ -197,23 +222,18 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .results-title {
-            font-size: 16px;
-            color: #4ecdc4;
-            margin-bottom: 15px;
-            display: none;
-            text-align: center;
-        }
-        .results-title.active {
-            display: block;
-        }
-        .results {
+        .result-container {
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
+        }
+        .result-wrapper {
+            position: relative;
+            display: inline-block;
         }
         .result-image {
             max-width: 100%;
+            max-height: 500px;
             border-radius: 15px;
             cursor: pointer;
             transition: transform 0.3s;
@@ -222,13 +242,24 @@
         .result-image:hover {
             transform: scale(1.02);
         }
+        .result-user {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: #4ecdc4;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
         .error-message {
             background: rgba(255,107,107,0.1);
             border: 1px solid #ff6b6b;
             color: #ff6b6b;
             padding: 15px;
             border-radius: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
             display: none;
             text-align: center;
         }
@@ -241,14 +272,14 @@
             right: 20px;
             background: #2ecc71;
             color: #fff;
-            padding: 15px 20px;
+            padding: 12px 20px;
             border-radius: 10px;
             font-weight: bold;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s;
             z-index: 10000;
-            font-size: 14px;
+            font-size: 13px;
         }
         .toast.show {
             transform: translateY(0);
@@ -257,6 +288,112 @@
         .toast.error {
             background: #ff6b6b;
         }
+
+        /* Gallery Tabs */
+        .gallery-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .gallery-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .gallery-tab.active {
+            background: #4ecdc4;
+            color: #1a1a2e;
+            border-color: #4ecdc4;
+        }
+
+        /* History Scroll */
+        .history-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .history-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .history-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+        .history-card {
+            min-width: 200px;
+            max-width: 200px;
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: transform 0.2s;
+        }
+        .history-card:hover {
+            transform: scale(1.03);
+        }
+        .history-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .history-card .card-info {
+            padding: 10px;
+        }
+        .history-card .card-user {
+            font-size: 10px;
+            color: #4ecdc4;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .history-card .card-prompt {
+            font-size: 10px;
+            color: #888;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .history-card .card-actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-sm-copy {
+            background: #4ecdc4;
+            color: #1a1a2e;
+        }
+        .btn-sm-dl {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .btn-sm-pub {
+            background: #f39c12;
+            color: #fff;
+        }
+        .btn-sm-del {
+            background: #ff6b6b;
+            color: #fff;
+        }
+
         /* Preview Modal */
         .preview-modal {
             display: none;
@@ -280,6 +417,7 @@
             border-radius: 10px;
             object-fit: contain;
         }
+
         /* Auth Modal */
         .auth-modal {
             display: none;
@@ -310,20 +448,46 @@
             margin-bottom: 20px;
             text-align: center;
         }
-        .password-group {
+        .auth-input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        .password-wrapper {
             position: relative;
+            margin-bottom: 15px;
+        }
+        .password-wrapper .auth-input {
+            margin-bottom: 0;
+            padding-right: 45px;
         }
         .toggle-pw {
             position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 45px;
             background: none;
             border: none;
             color: #4ecdc4;
             cursor: pointer;
-            font-size: 18px;
-            padding: 5px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .toggle-pw:hover {
+            color: #fff;
         }
         .auth-link {
             text-align: center;
@@ -344,7 +508,7 @@
                 padding: 10px;
             }
             h1 {
-                font-size: 1.8em;
+                font-size: 1.6em;
             }
             .form-card {
                 padding: 15px;
@@ -354,12 +518,15 @@
                 font-size: 16px;
                 min-height: 60px;
             }
+            select {
+                font-size: 16px;
+            }
             .preset-list {
                 grid-template-columns: 1fr 1fr;
                 gap: 6px;
             }
             .preset-item {
-                padding: 8px 10px;
+                padding: 10px;
                 font-size: 11px;
             }
             .preset-item .preset-title {
@@ -378,8 +545,14 @@
             }
             .header {
                 flex-direction: column;
-                gap: 10px;
                 text-align: center;
+            }
+            .history-card {
+                min-width: 160px;
+                max-width: 160px;
+            }
+            .history-card img {
+                height: 120px;
             }
         }
     </style>
@@ -430,15 +603,10 @@
                     <textarea id="prompt" placeholder="Deskripsikan gambar yang ingin dibuat..." required></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label>Negative Prompt (Opsional)</label>
-                    <input type="text" id="negativePrompt" placeholder="Contoh: blurry, low quality, ugly">
-                </div>
-
                 <div class="row">
                     <div class="form-group">
                         <label>Ukuran Gambar</label>
-                        <select id="size" style="width:100%;padding:12px 15px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;">
+                        <select id="size">
                             <option value="1440x720">Landscape (1440x720)</option>
                             <option value="720x1440">Portrait (720x1440)</option>
                             <option value="1024x720">Landscape (1024x720)</option>
@@ -449,7 +617,7 @@
                     </div>
                     <div class="form-group">
                         <label>Style</label>
-                        <select id="style" style="width:100%;padding:12px 15px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;">
+                        <select id="style">
                             <option value="">Default</option>
                             <option value="anime">Anime</option>
                             <option value="realistic">Realistic</option>
@@ -470,8 +638,15 @@
 
         <div class="error-message" id="errorMessage"></div>
 
-        <div class="results-title" id="resultsTitle">Hasil Generate</div>
-        <div class="results" id="results"></div>
+        <!-- Latest Result -->
+        <div class="result-container" id="resultContainer"></div>
+
+        <!-- Gallery -->
+        <div class="gallery-tabs" id="galleryTabs" style="display:none;">
+            <button class="gallery-tab active" onclick="switchGallery('mine')">Galeri Saya</button>
+            <button class="gallery-tab" onclick="switchGallery('public')">Galeri Publik</button>
+        </div>
+        <div class="history-scroll" id="historyScroll"></div>
     </div>
 
     <!-- Preview Modal -->
@@ -484,18 +659,15 @@
         <div class="auth-card">
             <div class="auth-title" id="authTitle">Login</div>
             <form id="authForm">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="authUsername" placeholder="Username" required>
+                <input type="text" class="auth-input" id="authUsername" placeholder="Username" required>
+                <div class="password-wrapper">
+                    <input type="password" class="auth-input" id="authPassword" placeholder="Password" required>
+                    <button type="button" class="toggle-pw" onclick="togglePassword()" tabindex="-1">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
                 </div>
-                <div class="form-group password-group">
-                    <label>Password</label>
-                    <input type="password" id="authPassword" placeholder="Password" required>
-                    <button type="button" class="toggle-pw" onclick="togglePassword()">O</button>
-                </div>
-                <div class="form-group" id="confirmGroup" style="display:none;">
-                    <label>Confirm Password</label>
-                    <input type="password" id="authConfirm" placeholder="Confirm password">
+                <div class="password-wrapper" id="confirmGroup" style="display:none;">
+                    <input type="password" class="auth-input" id="authConfirm" placeholder="Confirm password">
                 </div>
                 <button type="submit" class="btn-generate" style="margin-top:10px;">Submit</button>
             </form>
@@ -510,7 +682,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Cookie management
+        // ============ COOKIE & STORAGE ============
         function setCookie(name, value, days = 365) {
             const d = new Date();
             d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -528,23 +700,28 @@
             document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
         }
 
-        // User DB
-        let usersDB = {};
-        if (localStorage.getItem('usersDB')) {
-            try { usersDB = JSON.parse(localStorage.getItem('usersDB')); } catch(e) {}
+        function getDB(key) {
+            try { return JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { return {}; }
         }
 
-        // Results DB
-        let resultsDB = {};
-        if (localStorage.getItem('resultsDB')) {
-            try { resultsDB = JSON.parse(localStorage.getItem('resultsDB')); } catch(e) {}
+        function setDB(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
         }
 
+        // ============ GLOBAL STATE ============
+        let usersDB = getDB('usersDB');
+        let resultsDB = getDB('resultsDB');
+        let publicDB = getDB('publicDB');
         let currentUser = getCookie('ai_user');
+        let currentGallery = 'mine';
 
-        // Init
+        // ============ INIT ============
         if (currentUser) {
             showLoggedIn(currentUser);
+            document.getElementById('galleryTabs').style.display = 'flex';
+            renderGallery();
+        } else {
+            renderPublicGallery();
         }
 
         // Preset clicks
@@ -552,15 +729,11 @@
             item.addEventListener('click', function() {
                 document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
-                
-                const prompt = this.dataset.prompt;
-                const negative = this.dataset.negative;
-                
-                document.getElementById('prompt').value = prompt;
-                document.getElementById('negativePrompt').value = negative || '';
+                document.getElementById('prompt').value = this.dataset.prompt;
             });
         });
 
+        // ============ AUTH ============
         function showLoggedIn(username) {
             document.getElementById('userSection').innerHTML = `
                 <span class="user-badge">@${username}</span>
@@ -574,6 +747,8 @@
             document.getElementById('userSection').innerHTML = `
                 <button class="btn btn-primary" onclick="showAuthModal('login')">Login</button>
             `;
+            document.getElementById('galleryTabs').style.display = 'none';
+            renderPublicGallery();
             showToast('Logged out');
         }
 
@@ -581,6 +756,7 @@
             document.getElementById('authModal').classList.add('active');
             document.getElementById('authError').classList.remove('active');
             document.getElementById('authError').style.display = 'none';
+            document.getElementById('authForm').reset();
             
             if (type === 'login') {
                 document.getElementById('authTitle').textContent = 'Login';
@@ -598,29 +774,19 @@
         }
 
         function switchAuth() {
-            const currentType = document.getElementById('authForm').dataset.type;
-            showAuthModal(currentType === 'login' ? 'register' : 'login');
+            const t = document.getElementById('authForm').dataset.type;
+            showAuthModal(t === 'login' ? 'register' : 'login');
         }
 
         function togglePassword() {
-            const pwInput = document.getElementById('authPassword');
-            const confirmInput = document.getElementById('authConfirm');
-            const btn = document.querySelector('.toggle-pw');
-            
-            if (pwInput.type === 'password') {
-                pwInput.type = 'text';
-                if (confirmInput) confirmInput.type = 'text';
-                btn.textContent = '-';
-            } else {
-                pwInput.type = 'password';
-                if (confirmInput) confirmInput.type = 'password';
-                btn.textContent = 'O';
-            }
+            const pw = document.getElementById('authPassword');
+            const cf = document.getElementById('authConfirm');
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+            if (cf) cf.type = cf.type === 'password' ? 'text' : 'password';
         }
 
         document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const type = this.dataset.type;
             const username = document.getElementById('authUsername').value.trim();
             const password = document.getElementById('authPassword').value.trim();
@@ -630,67 +796,51 @@
             authError.classList.remove('active');
             authError.style.display = 'none';
 
-            if (!username || !password) {
-                showAuthError('Semua field harus diisi!');
-                return;
-            }
+            if (!username || !password) return showAuthError('Semua field harus diisi!');
+            if (username.length < 3) return showAuthError('Username minimal 3 karakter!');
+            if (password.length < 4) return showAuthError('Password minimal 4 karakter!');
 
-            if (username.length < 3) {
-                showAuthError('Username minimal 3 karakter!');
-                return;
-            }
-
-            if (password.length < 4) {
-                showAuthError('Password minimal 4 karakter!');
-                return;
-            }
+            usersDB = getDB('usersDB');
 
             if (type === 'register') {
-                if (password !== confirm) {
-                    showAuthError('Password tidak cocok!');
-                    return;
-                }
-                if (usersDB[username]) {
-                    showAuthError('Username sudah terdaftar!');
-                    return;
-                }
+                if (password !== confirm) return showAuthError('Password tidak cocok!');
+                if (usersDB[username]) return showAuthError('Username sudah terdaftar!');
                 
                 usersDB[username] = { password, created: new Date().toISOString() };
-                localStorage.setItem('usersDB', JSON.stringify(usersDB));
-                
+                setDB('usersDB', usersDB);
                 setCookie('ai_user', username);
                 currentUser = username;
-                showLoggedIn(username);
-                document.getElementById('authModal').classList.remove('active');
-                showToast('Registrasi berhasil!');
+                finishAuth('Registrasi berhasil!');
             } else {
-                if (!usersDB[username] || usersDB[username].password !== password) {
-                    showAuthError('Username atau password salah!');
-                    return;
-                }
-                
+                if (!usersDB[username] || usersDB[username].password !== password) return showAuthError('Username atau password salah!');
                 setCookie('ai_user', username);
                 currentUser = username;
-                showLoggedIn(username);
-                document.getElementById('authModal').classList.remove('active');
-                showToast('Login berhasil!');
+                finishAuth('Login berhasil!');
             }
         });
 
-        function showAuthError(message) {
-            const authError = document.getElementById('authError');
-            authError.textContent = message;
-            authError.classList.add('active');
-            authError.style.display = 'block';
+        function finishAuth(msg) {
+            showLoggedIn(currentUser);
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('galleryTabs').style.display = 'flex';
+            currentGallery = 'mine';
+            document.querySelectorAll('.gallery-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+            renderGallery();
+            showToast(msg);
+        }
+
+        function showAuthError(msg) {
+            const ae = document.getElementById('authError');
+            ae.textContent = msg;
+            ae.classList.add('active');
+            ae.style.display = 'block';
         }
 
         document.getElementById('authModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
-            }
+            if (e.target === this) this.classList.remove('active');
         });
 
-        // Generate form
+        // ============ GENERATE ============
         document.getElementById('generateForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -701,26 +851,22 @@
             }
 
             const prompt = document.getElementById('prompt').value.trim();
-            const negativePrompt = document.getElementById('negativePrompt').value.trim();
             const size = document.getElementById('size').value;
             const style = document.getElementById('style').value;
             const btnGenerate = document.getElementById('btnGenerate');
             const loading = document.getElementById('loading');
             const errorMessage = document.getElementById('errorMessage');
-            const results = document.getElementById('results');
-            const resultsTitle = document.getElementById('resultsTitle');
+            const resultContainer = document.getElementById('resultContainer');
 
             errorMessage.classList.remove('active');
             errorMessage.textContent = '';
-            results.innerHTML = '';
-            resultsTitle.classList.remove('active');
+            resultContainer.innerHTML = '';
 
             if (!prompt) {
                 showError('Prompt tidak boleh kosong!');
                 return;
             }
 
-            // Add style prefix
             let finalPrompt = prompt;
             if (style === 'anime') finalPrompt = 'Anime style, ' + prompt;
             if (style === 'realistic') finalPrompt = 'Ultra realistic, photorealistic, ' + prompt;
@@ -735,53 +881,40 @@
                 const response = await fetch('/api/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: finalPrompt,
-                        negativePrompt,
-                        size,
-                        jumlah: 1,
-                        username: currentUser
-                    })
+                    body: JSON.stringify({ prompt: finalPrompt, negativePrompt: '', size, jumlah: 1, username: currentUser })
                 });
 
                 const data = await response.json();
 
                 if (data.success && data.images && data.images.length > 0) {
-                    resultsTitle.classList.add('active');
-                    
                     const img = data.images[0];
-                    const imgElement = document.createElement('img');
-                    imgElement.src = img.url;
-                    imgElement.alt = 'Generated Image';
-                    imgElement.className = 'result-image';
-                    imgElement.onclick = function() {
-                        openPreview(img.url);
-                    };
-                    imgElement.loading = 'lazy';
-                    results.appendChild(imgElement);
+                    
+                    // Show result
+                    resultContainer.innerHTML = `
+                        <div class="result-wrapper">
+                            <img src="${img.url}" alt="Generated" class="result-image" onclick="openPreview('${img.url}')" loading="lazy">
+                            <span class="result-user">@${currentUser}</span>
+                        </div>
+                    `;
 
-                    // Save to resultsDB
-                    if (!resultsDB[currentUser]) {
-                        resultsDB[currentUser] = [];
-                    }
+                    // Save
+                    resultsDB = getDB('resultsDB');
+                    if (!resultsDB[currentUser]) resultsDB[currentUser] = [];
                     resultsDB[currentUser].unshift({
                         url: img.url,
                         prompt: finalPrompt,
-                        size: size,
-                        timestamp: new Date().toISOString()
+                        size,
+                        timestamp: new Date().toISOString(),
+                        public: false
                     });
+                    if (resultsDB[currentUser].length > 50) resultsDB[currentUser] = resultsDB[currentUser].slice(0, 50);
+                    setDB('resultsDB', resultsDB);
 
-                    if (resultsDB[currentUser].length > 50) {
-                        resultsDB[currentUser] = resultsDB[currentUser].slice(0, 50);
-                    }
-                    localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
-
+                    renderGallery();
                     showToast('Gambar berhasil dibuat!');
-
                 } else {
                     showError(data.message || 'Gagal generate gambar');
                 }
-
             } catch (error) {
                 showError('Network error, silakan coba lagi');
             } finally {
@@ -791,6 +924,117 @@
             }
         });
 
+        // ============ GALLERY ============
+        function switchGallery(type) {
+            currentGallery = type;
+            document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderGallery();
+        }
+
+        function renderGallery() {
+            if (!currentUser) return renderPublicGallery();
+
+            resultsDB = getDB('resultsDB');
+            publicDB = getDB('publicDB');
+            const container = document.getElementById('historyScroll');
+
+            let items = [];
+            if (currentGallery === 'mine') {
+                items = (resultsDB[currentUser] || []).map(r => ({ ...r, user: currentUser }));
+            } else {
+                items = Object.keys(publicDB).map(user => 
+                    publicDB[user].map(r => ({ ...r, user }))
+                ).flat();
+                items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            }
+
+            container.innerHTML = items.length === 0 
+                ? '<p style="color:#888;padding:20px;">Belum ada gambar</p>'
+                : items.map((r, i) => `
+                    <div class="history-card">
+                        <img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy">
+                        <div class="card-info">
+                            <div class="card-user">@${r.user}</div>
+                            <div class="card-prompt">${escapeHtml(r.prompt || '')}</div>
+                            <div class="card-actions">
+                                <button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button>
+                                <button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button>
+                                ${currentGallery === 'mine' ? `
+                                    <button class="btn-sm btn-sm-pub" onclick="event.stopPropagation();togglePublic('${currentUser}', ${i})">${r.public ? 'Unpub' : 'Pub'}</button>
+                                    <button class="btn-sm btn-sm-del" onclick="event.stopPropagation();deleteMyImage(${i})">X</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function renderPublicGallery() {
+            publicDB = getDB('publicDB');
+            const container = document.getElementById('historyScroll');
+            let items = Object.keys(publicDB).map(user => 
+                publicDB[user].map(r => ({ ...r, user }))
+            ).flat();
+            items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            container.innerHTML = items.length === 0 
+                ? '<p style="color:#888;padding:20px;">Belum ada gambar publik</p>'
+                : items.map(r => `
+                    <div class="history-card">
+                        <img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy">
+                        <div class="card-info">
+                            <div class="card-user">@${r.user}</div>
+                            <div class="card-prompt">${escapeHtml(r.prompt || '')}</div>
+                            <div class="card-actions">
+                                <button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button>
+                                <button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function togglePublic(username, index) {
+            resultsDB = getDB('resultsDB');
+            publicDB = getDB('publicDB');
+            
+            const item = resultsDB[username][index];
+            item.public = !item.public;
+            resultsDB[username][index] = item;
+            setDB('resultsDB', resultsDB);
+
+            if (item.public) {
+                if (!publicDB[username]) publicDB[username] = [];
+                publicDB[username].push(item);
+            } else {
+                if (publicDB[username]) {
+                    publicDB[username] = publicDB[username].filter(p => p.url !== item.url);
+                }
+            }
+            setDB('publicDB', publicDB);
+            renderGallery();
+            showToast(item.public ? 'Dipublikasikan!' : 'Diunpublish');
+        }
+
+        function deleteMyImage(index) {
+            if (!confirm('Hapus gambar ini?')) return;
+            resultsDB = getDB('resultsDB');
+            publicDB = getDB('publicDB');
+            
+            const item = resultsDB[currentUser][index];
+            resultsDB[currentUser].splice(index, 1);
+            setDB('resultsDB', resultsDB);
+
+            if (publicDB[currentUser]) {
+                publicDB[currentUser] = publicDB[currentUser].filter(p => p.url !== item.url);
+                setDB('publicDB', publicDB);
+            }
+            renderGallery();
+            showToast('Gambar dihapus');
+        }
+
+        // ============ UTILS ============
         function openPreview(url) {
             document.getElementById('previewImage').src = url;
             document.getElementById('previewModal').classList.add('active');
@@ -807,23 +1051,44 @@
             }
         });
 
-        function showError(message) {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            errorMessage.classList.add('active');
-            setTimeout(() => {
-                errorMessage.classList.remove('active');
-            }, 5000);
+        async function downloadImage(url) {
+            try {
+                const r = await fetch(url);
+                const b = await r.blob();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(b);
+                a.download = `image_${Date.now()}.jpg`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+                showToast('Download dimulai!');
+            } catch(e) {
+                window.open(url, '_blank');
+            }
         }
 
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast' + (isError ? ' error' : '');
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => showToast('Copied!')).catch(() => showToast('Gagal copy'));
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast' + (isError ? ' error' : '');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML;
         }
     </script>
 </body>
