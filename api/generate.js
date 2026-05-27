@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { prompt, negativePrompt, size, jumlah } = req.body;
+        const { prompt, negativePrompt, size, jumlah, username } = req.body;
 
         if (!prompt || prompt.trim() === '') {
             return res.status(400).json({ success: false, message: 'Prompt tidak boleh kosong' });
