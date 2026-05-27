@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - AI Image Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-label {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        .panel-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .panel-title {
+            font-size: 18px;
+            color: #4ecdc4;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            resize: vertical;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        textarea {
+            min-height: 80px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background: #4ecdc4;
+            color: #1a1a2e;
+        }
+        .btn-danger {
+            background: #ff6b6b;
+        }
+        .btn-success {
+            background: #2ecc71;
+            color: #1a1a2e;
+        }
+        .btn:hover {
+            transform: scale(1.02);
+        }
+        .log-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+            color: #aaa;
+        }
+        .log-time {
+            color: #4ecdc4;
+            margin-right: 10px;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .result-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .preview-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .preview-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .preview-info {
+            padding: 10px;
+            font-size: 12px;
+            color: #aaa;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        .message.active {
+            display: block;
+        }
+        .message-success {
+            background: rgba(46,204,113,0.1);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+        .message-error {
+            background: rgba(255,107,107,0.1);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .loading.active {
+            display: block;
+        }
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #4ecdc4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Panel</h1>
+        <p class="subtitle">AI Image Generator Management</p>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Generate Hari Ini</div>
+                <div class="stat-value" id="totalGenerate">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Gambar</div>
+                <div class="stat-value" id="totalImages">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Sisa Koin</div>
+                <div class="stat-value" id="sisaKoin">590</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Session</div>
+                <div class="stat-value">Active</div>
+            </div>
+        </div>
+
+        <!-- Quick Generate -->
+        <div class="panel-card">
+            <div class="panel-title">Quick Generate (Test API)</div>
+            
+            <div class="form-group">
+                <label>Prompt</label>
+                <textarea id="adminPrompt" placeholder="Masukkan prompt untuk testing..."></textarea>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label>Ukuran</label>
+                    <select id="adminSize">
+                        <option value="1024x1024">1024x1024</option>
+                        <option value="1440x720">1440x720</option>
+                        <option value="720x1440">720x1440</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah</label>
+                    <select id="adminJumlah">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="testGenerate()">Test Generate</button>
+            
+            <div class="loading" id="adminLoading">
+                <div class="spinner"></div>
+                <p>Generating...</p>
+            </div>
+            
+            <div class="message message-success" id="adminSuccess"></div>
+            <div class="message message-error" id="adminError"></div>
+            
+            <div class="result-preview" id="adminPreview"></div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="panel-card">
+            <div class="panel-title">
+                Log Aktivitas
+                <button class="btn btn-danger" onclick="clearLogs()" style="float:right;">Clear Logs</button>
+            </div>
+            <div class="log-list" id="logList">
+                <div class="log-item"><span class="log-time">--:--</span> Menunggu aktivitas...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Activity log
+        let logs = [];
+        if (localStorage.getItem('adminLogs')) {
+            try {
+                logs = JSON.parse(localStorage.getItem('adminLogs'));
+            } catch(e) {}
+        }
+
+        function addLog(message) {
+            const now = new Date();
+            const time = now.toLocaleTimeString('id-ID');
+            logs.unshift({ time, message });
+            if (logs.length > 100) logs = logs.slice(0, 100);
+            localStorage.setItem('adminLogs', JSON.stringify(logs));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const logList = document.getElementById('logList');
+            logList.innerHTML = logs.slice(0, 50).map(log => 
+                `<div class="log-item"><span class="log-time">${log.time}</span>${log.message}</div>`
+            ).join('') || '<div class="log-item">Tidak ada log</div>';
+        }
+
+        function clearLogs() {
+            if (confirm('Hapus semua log?')) {
+                logs = [];
+                localStorage.removeItem('adminLogs');
+                renderLogs();
+            }
+        }
+
+        // Update stats
+        const today = new Date().toDateString();
+        let genCount = 0;
+        let imgCount = 0;
+        
+        if (localStorage.getItem('genStats')) {
+            try {
+                const stats = JSON.parse(localStorage.getItem('genStats'));
+                if (stats.date === today) {
+                    genCount = stats.genCount || 0;
+                    imgCount = stats.imgCount || 0;
+                }
+            } catch(e) {}
+        }
+        
+        document.getElementById('totalGenerate').textContent = genCount;
+        document.getElementById('totalImages').textContent = imgCount;
+
+        async function testGenerate() {
+            const prompt = document.getElementById('adminPrompt').value.trim();
+            const size = document.getElementById('adminSize').value;
+            const jumlah = parseInt(document.getElementById('adminJumlah').value);
+            const loading = document.getElementById('adminLoading');
+            const preview = document.getElementById('adminPreview');
+            const successMsg = document.getElementById('adminSuccess');
+            const errorMsg = document.getElementById('adminError');
+
+            if (!prompt) {
+                errorMsg.textContent = 'Prompt tidak boleh kosong!';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            loading.classList.add('active');
+            preview.innerHTML = '';
+            successMsg.classList.remove('active');
+            errorMsg.classList.remove('active');
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, size, jumlah })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.images) {
+                    data.images.forEach((img, i) => {
+                        const card = document.createElement('div');
+                        card.className = 'preview-card';
+                        card.innerHTML = `
+                            <img src="${img.url}" alt="Preview ${i+1}">
+                            <div class="preview-info">${size} | Image ${i+1}</div>
+                        `;
+                        preview.appendChild(card);
+                    });
+
+                    genCount++;
+                    imgCount += data.images.length;
+                    
+                    localStorage.setItem('genStats', JSON.stringify({
+                        date: today,
+                        genCount,
+                        imgCount
+                    }));
+
+                    document.getElementById('totalGenerate').textContent = genCount;
+                    document.getElementById('totalImages').textContent = imgCount;
+                    document.getElementById('sisaKoin').textContent = data.pricing?.balance || 590;
+
+                    successMsg.textContent = `Berhasil generate ${data.images.length} gambar!`;
+                    successMsg.classList.add('active');
+                    addLog(`Generate: "${prompt.substring(0, 50)}..." | ${size} | ${data.images.length} gambar`);
+                } else {
+                    throw new Error(data.message || 'Gagal');
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Error: ' + error.message;
+                errorMsg.classList.add('active');
+                addLog(`ERROR: ${error.message}`);
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        renderLogs();
+        addLog('Admin panel opened');
+    </script>
+</body>
+</html>
