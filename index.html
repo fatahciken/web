@@ -21,7 +21,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto 20px;
         }
         .user-section {
@@ -57,17 +57,14 @@
         .btn-danger {
             background: #ff6b6b;
         }
-        .btn-warning {
-            background: #f39c12;
-        }
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
         }
         h1 {
             text-align: center;
             font-size: 2.5em;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -76,54 +73,91 @@
             text-align: center;
             color: #888;
             margin-bottom: 30px;
+            font-size: 14px;
         }
         .form-card {
             background: rgba(255,255,255,0.05);
             border-radius: 20px;
-            padding: 30px;
+            padding: 25px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         label {
             display: block;
             margin-bottom: 8px;
             color: #4ecdc4;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
         }
-        textarea, select, input {
+        textarea, input {
             width: 100%;
-            padding: 15px;
+            padding: 12px 15px;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.2);
             background: rgba(255,255,255,0.05);
             color: #fff;
-            font-size: 16px;
+            font-size: 14px;
             resize: vertical;
         }
         textarea {
-            min-height: 80px;
+            min-height: 70px;
         }
-        textarea:focus, select:focus, input:focus {
+        textarea:focus, input:focus {
             outline: none;
             border-color: #4ecdc4;
         }
-        select option {
-            background: #1a1a2e;
+        .preset-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .preset-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            color: #ccc;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .preset-item:hover {
+            border-color: #4ecdc4;
+            background: rgba(78,205,196,0.1);
+        }
+        .preset-item.active {
+            border-color: #4ecdc4;
+            background: rgba(78,205,196,0.15);
+            color: #4ecdc4;
+        }
+        .preset-item .preset-title {
+            font-weight: bold;
             color: #fff;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+        .preset-item.active .preset-title {
+            color: #4ecdc4;
+        }
+        .preset-item .preset-desc {
+            font-size: 11px;
+            color: #888;
         }
         .row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
         .btn-generate {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             border: none;
             border-radius: 10px;
@@ -132,7 +166,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         .btn-generate:hover {
             transform: scale(1.02);
@@ -164,65 +198,29 @@
             100% { transform: rotate(360deg); }
         }
         .results-title {
-            font-size: 18px;
+            font-size: 16px;
             color: #4ecdc4;
             margin-bottom: 15px;
             display: none;
+            text-align: center;
         }
         .results-title.active {
             display: block;
         }
         .results {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            display: flex;
+            justify-content: center;
             margin-bottom: 30px;
         }
-        .image-card {
-            background: rgba(255,255,255,0.05);
+        .result-image {
+            max-width: 100%;
             border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
             transition: transform 0.3s;
-            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .image-card:hover {
-            transform: translateY(-5px);
-        }
-        .image-card img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .image-info {
-            padding: 15px;
-        }
-        .image-prompt {
-            color: #aaa;
-            font-size: 13px;
-            margin-bottom: 10px;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        .btn-download, .btn-copy {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-        }
-        .btn-download {
-            background: #4ecdc4;
-            color: #1a1a2e;
-        }
-        .btn-copy {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+        .result-image:hover {
+            transform: scale(1.02);
         }
         .error-message {
             background: rgba(255,107,107,0.1);
@@ -232,6 +230,7 @@
             border-radius: 10px;
             margin-top: 20px;
             display: none;
+            text-align: center;
         }
         .error-message.active {
             display: block;
@@ -249,13 +248,17 @@
             opacity: 0;
             transition: all 0.3s;
             z-index: 10000;
+            font-size: 14px;
         }
         .toast.show {
             transform: translateY(0);
             opacity: 1;
         }
-        /* Modal Popup */
-        .modal {
+        .toast.error {
+            background: #ff6b6b;
+        }
+        /* Preview Modal */
+        .preview-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -266,40 +269,16 @@
             z-index: 9999;
             align-items: center;
             justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-        }
-        .modal-content img {
-            max-width: 100%;
-            max-height: 90vh;
-            border-radius: 10px;
-        }
-        .modal-close {
-            position: absolute;
-            top: -40px;
-            right: 0;
-            background: #ff6b6b;
-            color: #fff;
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            font-size: 20px;
             cursor: pointer;
         }
-        .modal-actions {
-            position: absolute;
-            bottom: -50px;
-            left: 0;
-            right: 0;
+        .preview-modal.active {
             display: flex;
-            gap: 10px;
+        }
+        .preview-modal img {
+            max-width: 95%;
+            max-height: 95vh;
+            border-radius: 10px;
+            object-fit: contain;
         }
         /* Auth Modal */
         .auth-modal {
@@ -320,12 +299,13 @@
         .auth-card {
             background: #1a1a2e;
             border-radius: 20px;
-            padding: 40px;
-            width: 400px;
+            padding: 30px;
+            width: 90%;
+            max-width: 380px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         .auth-title {
-            font-size: 1.5em;
+            font-size: 1.3em;
             color: #4ecdc4;
             margin-bottom: 20px;
             text-align: center;
@@ -335,24 +315,72 @@
         }
         .toggle-pw {
             position: absolute;
-            right: 15px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             color: #4ecdc4;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
+            padding: 5px;
         }
         .auth-link {
             text-align: center;
             margin-top: 15px;
             color: #888;
+            font-size: 13px;
         }
         .auth-link a {
             color: #4ecdc4;
             cursor: pointer;
             text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .form-card {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            textarea {
+                font-size: 16px;
+                min-height: 60px;
+            }
+            .preset-list {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .preset-item {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+            .preset-item .preset-title {
+                font-size: 11px;
+            }
+            .preset-item .preset-desc {
+                font-size: 10px;
+            }
+            .row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .btn-generate {
+                padding: 16px;
+                font-size: 16px;
+            }
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -366,40 +394,67 @@
 
     <div class="container">
         <h1>AI Image Generator</h1>
-        <p class="subtitle">Generate anime and realistic images instantly</p>
+        <p class="subtitle">Generate stunning anime and realistic images</p>
 
         <div class="form-card">
             <form id="generateForm">
+                <!-- Preset Prompts -->
+                <div class="form-group">
+                    <label>Quick Preset</label>
+                    <div class="preset-list" id="presetList">
+                        <div class="preset-item active" data-prompt="Anime style, ultra realistic, super detail, anime character with realistic background and landscape, 8k, masterpiece" data-negative="blurry, low quality, ugly, deformed">
+                            <div class="preset-title">Anime Super Realistik</div>
+                            <div class="preset-desc">Karakter anime + background realistis</div>
+                        </div>
+                        <div class="preset-item" data-prompt="Ultra realistic landscape, padang rumput hijau, langit biru cerah, awan putih, pegunungan jauh, sinar matahari golden hour, 8k, photorealistic" data-negative="blurry, low quality, painting, cartoon">
+                            <div class="preset-title">Padang Rumput</div>
+                            <div class="preset-desc">Pemandangan alam ultra realistis</div>
+                        </div>
+                        <div class="preset-item" data-prompt="Anime style, girl with long hair, sitting under cherry blossom tree, petals falling, soft lighting, dreamy atmosphere, studio ghibli style, 8k" data-negative="blurry, low quality, ugly, deformed hands">
+                            <div class="preset-title">Anime Ghibli</div>
+                            <div class="preset-desc">Gaya Studio Ghibli yang dreamy</div>
+                        </div>
+                        <div class="preset-item" data-prompt="Cyberpunk city, neon lights, rain, anime style, futuristic, highly detailed, 8k, masterpiece" data-negative="blurry, low quality, ugly">
+                            <div class="preset-title">Cyberpunk Anime</div>
+                            <div class="preset-desc">Kota futuristik dengan neon</div>
+                        </div>
+                        <div class="preset-item" data-prompt="Ultra realistic, pantai tropis, air jernih, pasir putih, pohon kelapa, matahari terbenam, langit orange dan ungu, 8k, photorealistic" data-negative="blurry, low quality, cartoon, painting">
+                            <div class="preset-title">Pantai Tropis</div>
+                            <div class="preset-desc">Sunset pantai ultra realistis</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Prompt</label>
-                    <textarea id="prompt" placeholder="Contoh: Anime style, pantai tropis saat matahari terbenam" required></textarea>
+                    <textarea id="prompt" placeholder="Deskripsikan gambar yang ingin dibuat..." required></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Negative Prompt (Opsional)</label>
-                    <textarea id="negativePrompt" placeholder="Contoh: blurry, low quality, ugly"></textarea>
+                    <input type="text" id="negativePrompt" placeholder="Contoh: blurry, low quality, ugly">
                 </div>
 
                 <div class="row">
                     <div class="form-group">
                         <label>Ukuran Gambar</label>
-                        <select id="size">
-                            <option value="1440x720">1440x720 (Landscape)</option>
-                            <option value="720x1440">720x1440 (Portrait)</option>
-                            <option value="1024x720">1024x720 (Landscape)</option>
-                            <option value="720x1024">720x1024 (Portrait)</option>
-                            <option value="1440x1440">1440x1440 (Square)</option>
-                            <option value="1024x1024">1024x1024 (Square)</option>
+                        <select id="size" style="width:100%;padding:12px 15px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;">
+                            <option value="1440x720">Landscape (1440x720)</option>
+                            <option value="720x1440">Portrait (720x1440)</option>
+                            <option value="1024x720">Landscape (1024x720)</option>
+                            <option value="720x1024">Portrait (720x1024)</option>
+                            <option value="1024x1024">Square (1024x1024)</option>
+                            <option value="1440x1440">Square HD (1440x1440)</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label>Jumlah Gambar</label>
-                        <select id="jumlah">
-                            <option value="1">1 Gambar</option>
-                            <option value="2">2 Gambar</option>
-                            <option value="3">3 Gambar</option>
-                            <option value="4">4 Gambar</option>
+                        <label>Style</label>
+                        <select id="style" style="width:100%;padding:12px 15px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;">
+                            <option value="">Default</option>
+                            <option value="anime">Anime</option>
+                            <option value="realistic">Realistic</option>
+                            <option value="3d">3D Render</option>
+                            <option value="painting">Painting</option>
                         </select>
                     </div>
                 </div>
@@ -410,7 +465,7 @@
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Generating image, please wait...</p>
+            <p>Generating image...</p>
         </div>
 
         <div class="error-message" id="errorMessage"></div>
@@ -419,16 +474,9 @@
         <div class="results" id="results"></div>
     </div>
 
-    <!-- Image Preview Modal -->
-    <div class="modal" id="imageModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal()">X</button>
-            <img id="modalImage" src="" alt="Preview">
-            <div class="modal-actions">
-                <button class="btn btn-primary" id="modalDownload">Download</button>
-                <button class="btn btn-warning" id="modalCopy">Copy URL</button>
-            </div>
-        </div>
+    <!-- Preview Modal -->
+    <div class="preview-modal" id="previewModal">
+        <img id="previewImage" src="" alt="Preview">
     </div>
 
     <!-- Auth Modal -->
@@ -449,7 +497,7 @@
                     <label>Confirm Password</label>
                     <input type="password" id="authConfirm" placeholder="Confirm password">
                 </div>
-                <button type="submit" class="btn-generate">Submit</button>
+                <button type="submit" class="btn-generate" style="margin-top:10px;">Submit</button>
             </form>
             <div class="auth-link">
                 <span id="authSwitchText">Belum punya akun?</span>
@@ -486,19 +534,32 @@
             try { usersDB = JSON.parse(localStorage.getItem('usersDB')); } catch(e) {}
         }
 
-        // Image results DB
+        // Results DB
         let resultsDB = {};
         if (localStorage.getItem('resultsDB')) {
             try { resultsDB = JSON.parse(localStorage.getItem('resultsDB')); } catch(e) {}
         }
 
         let currentUser = getCookie('ai_user');
-        let currentImageUrl = '';
 
         // Init
         if (currentUser) {
             showLoggedIn(currentUser);
         }
+
+        // Preset clicks
+        document.querySelectorAll('.preset-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                const prompt = this.dataset.prompt;
+                const negative = this.dataset.negative;
+                
+                document.getElementById('prompt').value = prompt;
+                document.getElementById('negativePrompt').value = negative || '';
+            });
+        });
 
         function showLoggedIn(username) {
             document.getElementById('userSection').innerHTML = `
@@ -519,6 +580,7 @@
         function showAuthModal(type) {
             document.getElementById('authModal').classList.add('active');
             document.getElementById('authError').classList.remove('active');
+            document.getElementById('authError').style.display = 'none';
             
             if (type === 'login') {
                 document.getElementById('authTitle').textContent = 'Login';
@@ -566,22 +628,30 @@
             const authError = document.getElementById('authError');
 
             authError.classList.remove('active');
+            authError.style.display = 'none';
 
             if (!username || !password) {
-                authError.textContent = 'Semua field harus diisi!';
-                authError.classList.add('active');
+                showAuthError('Semua field harus diisi!');
+                return;
+            }
+
+            if (username.length < 3) {
+                showAuthError('Username minimal 3 karakter!');
+                return;
+            }
+
+            if (password.length < 4) {
+                showAuthError('Password minimal 4 karakter!');
                 return;
             }
 
             if (type === 'register') {
                 if (password !== confirm) {
-                    authError.textContent = 'Password tidak cocok!';
-                    authError.classList.add('active');
+                    showAuthError('Password tidak cocok!');
                     return;
                 }
                 if (usersDB[username]) {
-                    authError.textContent = 'Username sudah terdaftar!';
-                    authError.classList.add('active');
+                    showAuthError('Username sudah terdaftar!');
                     return;
                 }
                 
@@ -595,8 +665,7 @@
                 showToast('Registrasi berhasil!');
             } else {
                 if (!usersDB[username] || usersDB[username].password !== password) {
-                    authError.textContent = 'Username atau password salah!';
-                    authError.classList.add('active');
+                    showAuthError('Username atau password salah!');
                     return;
                 }
                 
@@ -608,7 +677,13 @@
             }
         });
 
-        // Close auth modal on click outside
+        function showAuthError(message) {
+            const authError = document.getElementById('authError');
+            authError.textContent = message;
+            authError.classList.add('active');
+            authError.style.display = 'block';
+        }
+
         document.getElementById('authModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 this.classList.remove('active');
@@ -620,7 +695,7 @@
             e.preventDefault();
 
             if (!currentUser) {
-                showToast('Silakan login terlebih dahulu!');
+                showToast('Silakan login terlebih dahulu!', true);
                 showAuthModal('login');
                 return;
             }
@@ -628,7 +703,7 @@
             const prompt = document.getElementById('prompt').value.trim();
             const negativePrompt = document.getElementById('negativePrompt').value.trim();
             const size = document.getElementById('size').value;
-            const jumlah = parseInt(document.getElementById('jumlah').value);
+            const style = document.getElementById('style').value;
             const btnGenerate = document.getElementById('btnGenerate');
             const loading = document.getElementById('loading');
             const errorMessage = document.getElementById('errorMessage');
@@ -645,6 +720,13 @@
                 return;
             }
 
+            // Add style prefix
+            let finalPrompt = prompt;
+            if (style === 'anime') finalPrompt = 'Anime style, ' + prompt;
+            if (style === 'realistic') finalPrompt = 'Ultra realistic, photorealistic, ' + prompt;
+            if (style === '3d') finalPrompt = '3D render, highly detailed, ' + prompt;
+            if (style === 'painting') finalPrompt = 'Digital painting, masterpiece, ' + prompt;
+
             loading.classList.add('active');
             btnGenerate.disabled = true;
             btnGenerate.textContent = 'Generating...';
@@ -654,7 +736,10 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        prompt, negativePrompt, size, jumlah,
+                        prompt: finalPrompt,
+                        negativePrompt,
+                        size,
+                        jumlah: 1,
                         username: currentUser
                     })
                 });
@@ -664,38 +749,34 @@
                 if (data.success && data.images && data.images.length > 0) {
                     resultsTitle.classList.add('active');
                     
+                    const img = data.images[0];
+                    const imgElement = document.createElement('img');
+                    imgElement.src = img.url;
+                    imgElement.alt = 'Generated Image';
+                    imgElement.className = 'result-image';
+                    imgElement.onclick = function() {
+                        openPreview(img.url);
+                    };
+                    imgElement.loading = 'lazy';
+                    results.appendChild(imgElement);
+
                     // Save to resultsDB
                     if (!resultsDB[currentUser]) {
                         resultsDB[currentUser] = [];
                     }
-
-                    data.images.forEach((img, index) => {
-                        const card = document.createElement('div');
-                        card.className = 'image-card';
-                        card.innerHTML = `
-                            <img src="${img.url}" alt="Generated Image ${index + 1}" loading="lazy" onclick="openPreview('${img.url}')">
-                            <div class="image-info">
-                                <div class="image-prompt">${escapeHtml(prompt)}</div>
-                                <div class="btn-group">
-                                    <button class="btn-download" onclick="event.stopPropagation();downloadImage('${img.url}', 'image_${Date.now()}.jpg')">Download</button>
-                                    <button class="btn-copy" onclick="event.stopPropagation();copyUrl('${img.url}')">Copy URL</button>
-                                </div>
-                            </div>
-                        `;
-                        results.appendChild(card);
-
-                        resultsDB[currentUser].unshift({
-                            url: img.url,
-                            prompt: prompt,
-                            size: size,
-                            timestamp: new Date().toISOString()
-                        });
+                    resultsDB[currentUser].unshift({
+                        url: img.url,
+                        prompt: finalPrompt,
+                        size: size,
+                        timestamp: new Date().toISOString()
                     });
 
                     if (resultsDB[currentUser].length > 50) {
                         resultsDB[currentUser] = resultsDB[currentUser].slice(0, 50);
                     }
                     localStorage.setItem('resultsDB', JSON.stringify(resultsDB));
+
+                    showToast('Gambar berhasil dibuat!');
 
                 } else {
                     showError(data.message || 'Gagal generate gambar');
@@ -711,66 +792,20 @@
         });
 
         function openPreview(url) {
-            currentImageUrl = url;
-            document.getElementById('modalImage').src = url;
-            document.getElementById('imageModal').classList.add('active');
-            
-            document.getElementById('modalDownload').onclick = function() {
-                downloadImage(url, `image_${Date.now()}.jpg`);
-            };
-            
-            document.getElementById('modalCopy').onclick = function() {
-                copyUrl(url);
-            };
+            document.getElementById('previewImage').src = url;
+            document.getElementById('previewModal').classList.add('active');
         }
 
-        function closeModal() {
-            document.getElementById('imageModal').classList.remove('active');
-        }
-
-        document.getElementById('imageModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
+        document.getElementById('previewModal').addEventListener('click', function() {
+            this.classList.remove('active');
         });
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeModal();
+                document.getElementById('previewModal').classList.remove('active');
+                document.getElementById('authModal').classList.remove('active');
             }
         });
-
-        async function downloadImage(url, filename) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
-                showToast('Download dimulai!');
-            } catch (error) {
-                window.open(url, '_blank');
-            }
-        }
-
-        async function copyUrl(url) {
-            try {
-                await navigator.clipboard.writeText(url);
-                showToast('URL berhasil dicopy!');
-            } catch (error) {
-                const input = document.createElement('input');
-                input.value = url;
-                document.body.appendChild(input);
-                input.select();
-                document.execCommand('copy');
-                document.body.removeChild(input);
-                showToast('URL berhasil dicopy!');
-            }
-        }
 
         function showError(message) {
             const errorMessage = document.getElementById('errorMessage');
@@ -781,19 +816,14 @@
             }, 5000);
         }
 
-        function showToast(message) {
+        function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 2000);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
     </script>
 </body>
