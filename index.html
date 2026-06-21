@@ -1,565 +1,665 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 800px;
-            margin: 0 auto 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .user-section { display: flex; align-items: center; gap: 10px; }
-        .user-badge {
-            background: rgba(78,205,196,0.2);
-            color: #4ecdc4;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 13px;
-            transition: transform 0.2s;
-            white-space: nowrap;
-        }
-        .btn:hover { transform: scale(1.05); }
-        .btn-primary { background: #4ecdc4; color: #1a1a2e; }
-        .btn-danger { background: #ff6b6b; }
-        
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 {
-            text-align: center;
-            font-size: 2.2em;
-            margin-bottom: 5px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle { text-align: center; color: #888; margin-bottom: 25px; font-size: 14px; }
-        
-        .form-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 25px;
-        }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 8px; color: #4ecdc4; font-weight: bold; font-size: 13px; }
-        textarea, input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            font-size: 14px;
-            resize: vertical;
-            line-height: 1.5;
-        }
-        textarea { min-height: 70px; }
-        textarea:focus, input:focus { outline: none; border-color: #4ecdc4; }
-        
-        .preset-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-        .preset-item {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 8px 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 12px;
-            color: #ccc;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-        .preset-item:hover { border-color: #4ecdc4; background: rgba(78,205,196,0.1); }
-        .preset-item.active { border-color: #4ecdc4; background: rgba(78,205,196,0.2); color: #4ecdc4; }
-        
-        .option-list { display: flex; flex-wrap: wrap; gap: 8px; }
-        .option-item {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 11px;
-            color: #ccc;
-            font-weight: bold;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .option-item:hover { border-color: #4ecdc4; background: rgba(78,205,196,0.1); }
-        .option-item.active { border-color: #4ecdc4; background: rgba(78,205,196,0.2); color: #4ecdc4; }
-        .size-icon { width: 28px; height: 20px; border: 2px solid currentColor; border-radius: 3px; display: inline-block; }
-        .size-icon.landscape { width: 28px; height: 18px; }
-        .size-icon.portrait { width: 18px; height: 28px; }
-        .size-icon.square { width: 22px; height: 22px; }
-        
-        .btn-generate {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 5px;
-        }
-        .btn-generate:hover { transform: scale(1.02); }
-        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
-        .loading { display: none; text-align: center; padding: 20px; }
-        .loading.active { display: block; }
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #4ecdc4;
-            border-radius: 50%;
-            width: 40px; height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .result-container { display: flex; justify-content: center; margin-bottom: 10px; }
-        .result-wrapper { position: relative; display: inline-block; }
-        .result-image {
-            max-width: 100%;
-            max-height: 500px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: transform 0.3s;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .result-image:hover { transform: scale(1.02); }
-        .result-user {
-            position: absolute;
-            bottom: 10px; left: 10px;
-            background: rgba(0,0,0,0.7);
-            color: #4ecdc4;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        .error-message {
-            background: rgba(255,107,107,0.1);
-            border: 1px solid #ff6b6b;
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: none;
-            text-align: center;
-        }
-        .error-message.active { display: block; }
-        
-        .toast {
-            position: fixed;
-            bottom: 20px; right: 20px;
-            background: #2ecc71;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 10000;
-            font-size: 13px;
-        }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.error { background: #ff6b6b; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>NodeRouter — The Unified Interface For AI Models</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-        .saran-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 15px 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .saran-icon svg { width: 24px; height: 24px; stroke: #4ecdc4; }
-        .saran-input {
-            flex: 1;
-            padding: 10px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            font-size: 13px;
-        }
-        .saran-input:focus { outline: none; border-color: #4ecdc4; }
-        .btn-saran {
-            padding: 10px 20px;
-            background: #4ecdc4;
-            color: #1a1a2e;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 13px;
-            white-space: nowrap;
-        }
-        .btn-saran:hover { transform: scale(1.05); }
+  :root{
+    --ink:#0A0A0A;
+    --ink-soft:#3A3A3A;
+    --muted:#6E6E6E;
+    --faint:#A3A3A1;
+    --bg:#FFFFFF;
+    --hair:#E7E7E5;
+    --hair-strong:#D9D9D6;
+    --accent:#3F3FF0;
+    --accent-soft:#EEEEFD;
+    --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
+  ::selection{ background:var(--accent-soft); color:var(--ink); }
+  *:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  button{ font-family:inherit; cursor:pointer; }
 
-        .gallery-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .gallery-tab {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .gallery-tab.active { background: #4ecdc4; color: #1a1a2e; border-color: #4ecdc4; }
-        .history-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-        .history-scroll::-webkit-scrollbar { height: 4px; }
-        .history-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        .history-card {
-            min-width: 200px; max-width: 200px;
-            flex-shrink: 0;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: transform 0.2s;
-        }
-        .history-card:hover { transform: scale(1.03); }
-        .history-card img { width: 100%; height: 150px; object-fit: cover; cursor: pointer; }
-        .history-card .card-info { padding: 10px; }
-        .history-card .card-user { font-size: 10px; color: #4ecdc4; font-weight: bold; margin-bottom: 4px; }
-        .history-card .card-prompt { font-size: 10px; color: #888; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px; }
-        .history-card .card-actions { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn-sm { padding: 4px 8px; border: none; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
-        .btn-sm-copy { background: #4ecdc4; color: #1a1a2e; }
-        .btn-sm-dl { background: rgba(255,255,255,0.2); color: #fff; }
-        .btn-sm-pub { background: #f39c12; color: #fff; }
-        .btn-sm-del { background: #ff6b6b; color: #fff; }
+  #app{ position:relative; width:100%; height:100vh; height:100dvh; overflow:hidden; background:var(--bg); }
+  .screen{ position:absolute; inset:0; display:flex; flex-direction:column; background:var(--bg); }
+  .screen.hidden{ visibility:hidden; pointer-events:none; }
 
-        .preview-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .preview-modal.active { display: flex; }
-        .preview-modal img { max-width: 95%; max-height: 95vh; border-radius: 10px; object-fit: contain; }
-        .auth-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 9998;
-            align-items: center;
-            justify-content: center;
-        }
-        .auth-modal.active { display: flex; }
-        .auth-card {
-            background: #1a1a2e;
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 380px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .auth-title { font-size: 1.3em; color: #4ecdc4; margin-bottom: 20px; text-align: center; }
-        .auth-input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-        .auth-input:focus { outline: none; border-color: #4ecdc4; }
-        .password-wrapper { position: relative; margin-bottom: 15px; }
-        .password-wrapper .auth-input { margin-bottom: 0; padding-right: 45px; }
-        .toggle-pw {
-            position: absolute;
-            right: 0; top: 0;
-            height: 100%; width: 45px;
-            background: none;
-            border: none;
-            color: #4ecdc4;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
-        .toggle-pw:hover { color: #fff; }
-        .auth-link { text-align: center; margin-top: 15px; color: #888; font-size: 13px; }
-        .auth-link a { color: #4ecdc4; cursor: pointer; text-decoration: none; font-weight: bold; }
+  #welcome{
+    align-items:center; justify-content:flex-start;
+    overflow-y:auto;
+    transition: opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
+  }
+  #welcome.leaving{ opacity:0; transform:scale(.98); pointer-events:none; }
 
-        @media (max-width: 600px) {
-            body { padding: 10px; }
-            h1 { font-size: 1.6em; }
-            .form-card { padding: 15px; border-radius: 15px; }
-            textarea { font-size: 16px; min-height: 60px; }
-            .preset-item { padding: 6px 12px; font-size: 11px; }
-            .option-item { padding: 10px 12px; font-size: 10px; }
-            .btn-generate { padding: 16px; font-size: 16px; }
-            .header { flex-direction: column; text-align: center; }
-            .saran-card { flex-direction: column; align-items: stretch; }
-            .history-card { min-width: 160px; max-width: 160px; }
-            .history-card img { height: 120px; }
-        }
-    </style>
+  .w-nav{
+    width:100%; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; border-bottom:1px solid var(--hair);
+  }
+  .w-brand{ display:flex; align-items:center; gap:9px; font-weight:800; font-size:16px; letter-spacing:-0.02em; }
+  .w-brand .mark{ width:24px; height:24px; border-radius:6px; display:block; }
+  .w-brand .accent{ color:var(--accent); }
+  .w-nav-links{ display:flex; align-items:center; gap:26px; font-size:13px; color:var(--ink-soft); font-weight:500; }
+  .w-nav-links a{ color:inherit; text-decoration:none; cursor:pointer; }
+  .w-nav-links a:hover{ color:var(--ink); }
+
+  .w-hero{
+    width:100%; max-width:760px; margin:0 auto;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding:72px 24px 48px;
+  }
+  .w-eyebrow{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--mono); font-size:11px; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--ink-soft); border:1px solid var(--hair-strong); padding:5px 12px 5px 8px; border-radius:99px;
+    margin-bottom:26px;
+  }
+  .w-eyebrow .led{ width:6px; height:6px; border-radius:50%; background:#16A34A; }
+
+  .w-hero h1{
+    font-size:50px; font-weight:800; line-height:1.07; letter-spacing:-0.035em; margin:0;
+    color:var(--ink);
+  }
+  .w-hero h1 .accent{ color:var(--accent); }
+  .w-hero p.sub{
+    font-size:17px; color:var(--muted); margin:22px 0 0; line-height:1.6; max-width:520px;
+  }
+  .w-hero p.sub b{ color:var(--ink-soft); font-weight:600; }
+
+  .w-cta-row{ display:flex; align-items:center; gap:12px; margin-top:36px; flex-wrap:wrap; justify-content:center; }
+  .btn-primary{
+    border:1px solid var(--ink); background:var(--ink); color:#fff;
+    font-size:14px; font-weight:700; padding:13px 26px; border-radius:11px;
+    display:flex; align-items:center; gap:8px; letter-spacing:.01em;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(10,10,10,.18); }
+  .btn-primary svg{ width:15px; height:15px; }
+  .btn-secondary{
+    border:1px solid var(--hair-strong); background:var(--bg); color:var(--ink);
+    font-size:14px; font-weight:700; padding:13px 24px; border-radius:11px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .btn-secondary:hover{ border-color:var(--ink); }
+
+  .w-stats{
+    width:100%; max-width:680px; margin:56px auto 0;
+    display:grid; grid-template-columns:repeat(4, 1fr);
+    border-top:1px solid var(--hair);
+  }
+  .w-stat{ padding:24px 12px; text-align:center; border-right:1px solid var(--hair); }
+  .w-stat:last-child{ border-right:none; }
+  .w-stat .num{ font-size:25px; font-weight:800; letter-spacing:-0.02em; color:var(--ink); }
+  .w-stat .num.accent{ color:var(--accent); }
+  .w-stat .lbl{ font-size:11.5px; color:var(--faint); margin-top:4px; font-weight:500; }
+
+  .w-foot-strip{
+    width:100%; flex:0 0 auto; padding:18px 28px 26px; text-align:center;
+    font-size:11.5px; color:var(--faint); font-family:var(--mono);
+  }
+
+  #loading{ align-items:center; justify-content:center; }
+  #loading.hidden{ visibility:hidden; }
+  #loading{
+    transition: opacity .5s cubic-bezier(.4,0,.2,1), visibility 0s linear .5s;
+  }
+  #loading.leaving{ opacity:0; pointer-events:none; visibility:hidden; }
+
+  .l-bg-grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(to right, #F2F2F1 1px, transparent 1px),
+      linear-gradient(to bottom, #F2F2F1 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image: radial-gradient(circle at 50% 42%, black 0%, transparent 68%);
+    -webkit-mask-image: radial-gradient(circle at 50% 42%, black 0%, transparent 68%);
+  }
+
+  .l-inner{ position:relative; display:flex; flex-direction:column; align-items:center; gap:30px; padding:32px; width:100%; max-width:380px; }
+
+  .l-mark{ width:60px; height:60px; position:relative; }
+  .l-mark img{ width:100%; height:100%; display:block; border-radius:14px; animation: markbreathe 1.8s ease infinite; }
+  @keyframes markbreathe{ 0%,100%{ transform:scale(1); opacity:.85; } 50%{ transform:scale(1.06); opacity:1; } }
+  @keyframes pulse{ 0%,100%{transform:scale(1);opacity:.35;} 50%{transform:scale(1.18);opacity:1;} }
+
+  .l-wordmark{ font-weight:800; font-size:22px; letter-spacing:-0.03em; }
+  .l-wordmark .accent{ color:var(--accent); }
+
+  .l-progress-wrap{ width:100%; display:flex; flex-direction:column; gap:10px; }
+  .l-progress-track{ width:100%; height:3px; background:var(--hair); border-radius:3px; overflow:hidden; }
+  .l-progress-fill{ height:100%; width:0%; background:var(--ink); border-radius:3px; transition: width .35s linear; }
+  .l-progress-meta{ display:flex; align-items:center; justify-content:space-between; font-family:var(--mono); font-size:11px; color:var(--faint); }
+  .l-progress-meta #loadPct{ color:var(--ink-soft); font-weight:600; }
+
+  .l-steps{ width:100%; display:flex; flex-direction:column; gap:9px; margin-top:2px; }
+  .l-step{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--faint); transition: color .25s ease; }
+  .l-step .step-icon{
+    width:16px; height:16px; border-radius:50%; border:1.5px solid var(--hair-strong);
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+    transition: border-color .25s ease, background .25s ease;
+  }
+  .l-step .step-icon svg{ width:9px; height:9px; opacity:0; transition:opacity .2s ease; color:#fff; }
+  .l-step.active{ color:var(--ink); font-weight:600; }
+  .l-step.active .step-icon{ border-color:var(--ink); }
+  .l-step.done{ color:var(--ink-soft); }
+  .l-step.done .step-icon{ border-color:var(--ink); background:var(--ink); }
+  .l-step.done .step-icon svg{ opacity:1; }
+  .l-step.active .step-icon::after{
+    content:''; width:6px; height:6px; border-radius:50%; background:var(--ink);
+    animation:pulse 1s ease infinite;
+  }
+
+  #viewer{ }
+  .v-topbar{
+    height:58px; flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+    padding:0 20px; border-bottom:1px solid var(--hair);
+  }
+  .v-brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:16.5px; letter-spacing:-0.02em; user-select:none; }
+  .v-brand .mark-img{ width:26px; height:26px; border-radius:7px; flex:0 0 auto; display:block; }
+  .v-brand .accent{ color:var(--accent); }
+  .v-brand-tag{
+    font-family:var(--mono); font-size:10px; color:var(--muted); background:var(--accent-soft);
+    border:1px solid #E1E1FB; padding:2px 7px; border-radius:99px; margin-left:2px;
+  }
+  .v-topbar-right{ display:flex; align-items:center; gap:12px; }
+  .v-credit{
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); border:1px solid var(--hair-strong);
+    padding:5px 10px; border-radius:8px; display:flex; align-items:center; gap:6px;
+  }
+  .v-credit .led{ width:6px; height:6px; border-radius:50%; background:#16A34A; }
+  .v-avatar{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex:0 0 auto; }
+
+  .v-subbar{
+    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:12px 20px; border-bottom:1px solid var(--hair); background:#FCFCFB; flex-wrap:wrap;
+  }
+  .v-subbar-left{ display:flex; flex-direction:column; gap:2px; }
+  .v-subbar-left .lbl{ font-size:11px; color:var(--faint); font-family:var(--mono); letter-spacing:.03em; text-transform:uppercase; }
+  .v-subbar-left .ttl{ font-size:14px; font-weight:700; color:var(--ink); }
+
+  .model-select-wrap{ position:relative; }
+  .model-select{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--hair-strong); background:var(--bg);
+    padding:8px 11px 8px 10px; border-radius:10px; font-size:13px; color:var(--ink); font-weight:600; min-width:222px;
+  }
+  .model-select:hover{ border-color:var(--ink); }
+  .model-dot{ width:7px; height:7px; border-radius:50%; flex:0 0 auto; }
+  .model-select .meta{ display:flex; flex-direction:column; align-items:flex-start; line-height:1.25; flex:1; min-width:0; }
+  .model-select .meta .mname{ font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+  .model-select .meta .mprov{ font-size:10px; color:var(--faint); font-weight:500; font-family:var(--mono); }
+  .model-select .chev{ width:14px; height:14px; color:var(--muted); flex:0 0 auto; transition:transform .15s ease; }
+  .model-select-wrap.open .chev{ transform:rotate(180deg); }
+
+  .model-dropdown{
+    position:absolute; top:calc(100% + 7px); right:0; width:300px; background:var(--bg);
+    border:1px solid var(--hair-strong); border-radius:12px; box-shadow:0 14px 36px rgba(10,10,10,.1), 0 2px 8px rgba(10,10,10,.05);
+    padding:6px; z-index:40; opacity:0; transform:translateY(-4px) scale(.98); pointer-events:none;
+    transition: opacity .14s ease, transform .14s ease;
+  }
+  .model-select-wrap.open .model-dropdown{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .model-dropdown-label{ font-size:10px; font-weight:700; color:var(--faint); text-transform:uppercase; letter-spacing:.06em; padding:8px 10px 4px; }
+  .model-dropdown-list{ max-height:168px; overflow-y:auto; }
+  .model-option{ display:flex; align-items:center; gap:10px; padding:10px; border-radius:9px; border:none; background:none; width:100%; text-align:left; }
+  .model-option:hover{ background:#F5F5F4; }
+  .model-option.selected{ background:var(--accent-soft); }
+  .model-option .meta{ flex:1; min-width:0; }
+  .model-option .mname{ font-size:13px; font-weight:700; color:var(--ink); }
+  .model-option .mdesc{ font-size:11px; color:var(--muted); margin-top:1px; }
+  .model-option .check{ width:14px; height:14px; color:var(--accent); flex:0 0 auto; opacity:0; }
+  .model-option.selected .check{ opacity:1; }
+
+  .v-main{ flex:1 1 auto; display:flex; min-height:0; }
+  .v-code-col{ flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
+
+  .fetch-pill{
+    font-family:var(--mono); font-size:10px; color:#E4E4E7; background:#1C1C1F; border:1px solid #2A2A2D;
+    padding:2px 8px; border-radius:5px; font-weight:600; letter-spacing:.02em;
+  }
+
+  .v-code-toolbar{
+    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+    padding:11px 20px; background:#0A0A0B; border-bottom:1px solid #1E1E20;
+  }
+  .v-code-toolbar .label{ font-family:var(--mono); font-size:11px; color:#8A8A8E; letter-spacing:.04em; text-transform:uppercase; display:flex; align-items:center; gap:8px; }
+  .lang-pill{ font-family:var(--mono); font-size:10px; color:#0A0A0A; background:#F2C744; padding:2px 7px; border-radius:5px; font-weight:700; }
+  .copy-code-btn{ border:1px solid #2A2A2D; background:transparent; color:#B8B8BC; font-size:11.5px; padding:6px 11px; border-radius:8px; display:flex; align-items:center; gap:6px; }
+  .copy-code-btn:hover{ border-color:#444; color:#fff; }
+  .copy-code-btn svg{ width:12px; height:12px; }
+
+  .v-code-scroll{ flex:1; overflow:auto; background:#0A0A0B; padding:22px 24px 40px 0; }
+  .v-code-scroll pre{ margin:0; font-family:var(--mono); font-size:12.8px; line-height:1.7; color:#E4E4E7; white-space:pre; tab-size:2; }
+  .v-code-table{ display:table; width:100%; border-collapse:collapse; }
+  .v-code-row{ display:table-row; }
+  .v-code-row .ln{
+    display:table-cell; user-select:none; -webkit-user-select:none;
+    text-align:right; padding:0 16px 0 0; color:#4A4A4F;
+    font-family:var(--mono); font-size:12.8px; line-height:1.7;
+    width:1%; white-space:nowrap; vertical-align:top;
+    position:sticky; left:0; background:#0A0A0B;
+  }
+  .v-code-row .ln-pad-left{ display:table-cell; width:24px; }
+  .v-code-row .code-line{
+    display:table-cell; font-family:var(--mono); font-size:12.8px; line-height:1.7;
+    color:#E4E4E7; white-space:pre; vertical-align:top; padding-right:24px;
+  }
+  .tok-kw{ color:#C792EA; }
+  .tok-str{ color:#9CDA84; }
+  .tok-fn{ color:#82AAFF; }
+  .tok-com{ color:#5C6370; font-style:italic; }
+  .tok-num{ color:#F78C6C; }
+  .tok-prop{ color:#7DD3FC; }
+  .tok-class{ color:#FFCB6B; }
+
+  .v-sidebar{
+    width:300px; flex:0 0 auto; border-left:1px solid var(--hair); padding:22px 20px; overflow-y:auto;
+    display:flex; flex-direction:column; gap:22px;
+  }
+  .v-side-block .h{ font-size:11px; font-weight:700; color:var(--faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+  .v-spec-row{ display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F1F1EF; font-size:12.5px; }
+  .v-spec-row:last-child{ border-bottom:none; }
+  .v-spec-row .k{ color:var(--muted); }
+  .v-spec-row .v{ color:var(--ink); font-weight:600; font-family:var(--mono); font-size:12px; }
+  .v-desc-text{ font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
+  .v-tag-row{ display:flex; gap:6px; flex-wrap:wrap; }
+  .v-tag{ font-size:10.5px; font-weight:600; color:var(--ink-soft); background:#F4F4F3; border:1px solid var(--hair); padding:4px 9px; border-radius:99px; }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:90;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  .overlay.active{ opacity:1; pointer-events:auto; }
+
+  .panel{
+    position:fixed; top:0; right:0; bottom:0; width:480px; max-width:92vw; background:#fff;
+    z-index:100; transform:translateX(100%); transition:transform .35s cubic-bezier(.4,0,.2,1);
+    display:flex; flex-direction:column; box-shadow:-10px 0 40px rgba(0,0,0,.12);
+  }
+  .panel.active{ transform:translateX(0); }
+  .panel-header{
+    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px; border-bottom:1px solid var(--hair);
+  }
+  .panel-header h3{ margin:0; font-size:18px; font-weight:800; letter-spacing:-.02em; }
+  .panel-close{
+    border:1px solid var(--hair-strong); background:var(--bg); width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--ink); line-height:1;
+  }
+  .panel-close:hover{ background:#f4f4f4; }
+  .panel-body{ flex:1; overflow-y:auto; padding:24px; }
+  .panel-body p,.panel-body li{ font-size:14px; color:var(--ink-soft); line-height:1.7; }
+  .panel-body h4{ font-size:15px; font-weight:700; margin:20px 0 8px; color:var(--ink); }
+  .panel-body code{ font-family:var(--mono); font-size:12px; background:#f4f4f4; padding:2px 6px; border-radius:4px; }
+  .panel-body pre{ font-family:var(--mono); font-size:12px; background:#f8f8f8; padding:14px; border-radius:8px; overflow-x:auto; white-space:pre-wrap; line-height:1.6; margin:10px 0; }
+  .model-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .model-card{ border:1px solid var(--hair); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:8px; }
+  .model-card .mc-top{ display:flex; align-items:center; gap:10px; }
+  .model-card .mc-dot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+  .model-card .mc-name{ font-weight:700; font-size:14px; }
+  .model-card .mc-slug{ font-family:var(--mono); font-size:10px; color:var(--faint); }
+  .model-card .mc-desc{ font-size:11.5px; color:var(--muted); line-height:1.5; }
+  .model-card .mc-tags{ display:flex; gap:4px; flex-wrap:wrap; }
+  .model-card .mc-tag{ font-size:10px; background:#f4f4f3; padding:2px 7px; border-radius:99px; color:var(--ink-soft); }
+
+  @media (max-width: 880px){
+    .v-sidebar{ display:none; }
+    .panel{ width:100%; max-width:100%; }
+    .model-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 680px){
+    #app{ overflow:auto; }
+    .screen{ position:relative; min-height:100vh; min-height:100dvh; }
+    .screen.hidden{ display:none; }
+    #welcome{ overflow:visible; }
+    .w-nav{ padding:12px 14px; }
+    .w-nav-links{ gap:14px; font-size:11px; }
+    .w-brand{ font-size:14px; }
+    .w-brand .mark{ width:20px; height:20px; }
+    .w-hero{ padding:36px 14px 28px; }
+    .w-hero h1{ font-size:26px; }
+    .w-hero p.sub{ font-size:13px; margin:14px 0 0; }
+    .w-stats{ grid-template-columns:repeat(2,1fr); margin-top:28px; }
+    .w-stat{ padding:14px 6px; border-bottom:1px solid var(--hair); }
+    .w-stat .num{ font-size:20px; }
+    .w-stat .lbl{ font-size:10px; }
+    .btn-primary,.btn-secondary{ font-size:12px; padding:10px 16px; }
+    .w-foot-strip{ font-size:10px; padding:12px 14px 18px; }
+    .v-topbar{ padding:0 12px; height:48px; }
+    .v-brand{ font-size:13px; gap:6px; }
+    .v-brand .mark-img{ width:20px; height:20px; }
+    .v-brand-tag{ display:none; }
+    .v-credit{ display:none; }
+    .v-avatar{ width:24px; height:24px; font-size:10px; }
+    .v-subbar{ padding:8px 12px; gap:8px; }
+    .model-select{ min-width:0; padding:6px 8px; font-size:11px; }
+    .model-select .meta .mname{ max-width:80px; font-size:11px; }
+    .model-dropdown{ width:240px; right:-8px; }
+    .v-code-scroll{ padding:12px 10px 24px 0; }
+    .v-code-toolbar{ padding:8px 12px; }
+    .v-code-toolbar .label{ font-size:9px; gap:4px; }
+    .lang-pill{ font-size:8px; padding:1px 5px; }
+    .copy-code-btn{ font-size:10px; padding:4px 8px; }
+    .v-code-scroll pre{ font-size:10px; }
+    .v-code-row .ln{ font-size:10px; padding:0 8px 0 0; }
+    .v-code-row .code-line{ font-size:10px; }
+    .v-code-row .ln-pad-left{ width:12px; }
+    .l-inner{ padding:20px; gap:20px; }
+    .l-mark{ width:44px; height:44px; }
+    .l-wordmark{ font-size:18px; }
+    .l-step{ font-size:11px; }
+  }
+</style>
 </head>
 <body>
-    <div class="header">
-        <div></div>
-        <div class="user-section" id="userSection">
-            <button class="btn btn-primary" onclick="showAuthModal('login')">Login</button>
-        </div>
+
+<div id="app">
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="panel" id="panelModels">
+    <div class="panel-header"><h3>Models</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+    <div class="panel-body"><p style="margin-top:0;">6 model tersedia melalui satu endpoint unified.</p><div class="model-grid" id="panelModelGrid"></div></div>
+  </div>
+
+  <div class="panel" id="panelDocs">
+    <div class="panel-header"><h3>Dokumentasi</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+    <div class="panel-body">
+      <h4>Chat Completions</h4>
+      <pre>POST /v1/completions
+Content-Type: application/json
+
+{
+  "model": "noderouter/gpt-5.5",
+  "messages": [
+    { "role": "system", "content": "..." },
+    { "role": "user", "content": "..." }
+  ]
+}</pre>
+      <h4>Image Generation</h4>
+      <pre>POST /v1/images
+Content-Type: application/json
+
+{
+  "model": "noderouter/flux-schnell",
+  "prompt": "A beautiful sunset"
+}</pre>
+      <h4>Response</h4>
+      <pre>{"content": "..."}</pre>
     </div>
+  </div>
 
-    <div class="container">
-        <h1>AI Image Generator</h1>
-        <p class="subtitle">Generate stunning anime and realistic images</p>
-
-        <div class="form-card">
-            <form id="generateForm">
-                <div class="form-group">
-                    <label>Preset</label>
-                    <div class="preset-list" id="presetList">
-                        <div class="preset-item active" data-prompt="masterpiece, best quality, cinematic lighting, anime art style, hand-drawn aesthetic, modern Japanese anime movie visual, highly detailed background, photorealistic clouds and sky, beautiful architecture, soft natural lighting, lens flare, depth of field, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Cinematic Anime</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, girl sitting by crystal clear river, flowing water, detailed rocks, sun rays through trees, photorealistic nature background, hand-drawn anime character, soft lighting, dappled light, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">River Scene</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, ultra realistic, photorealistic landscape, vast green meadow, dramatic cumulus clouds, golden hour sunlight, distant mountains, wildflowers, 8k, highly detailed nature" data-negative="blurry, low quality, painting, cartoon, anime, ugly, deformed">Ultra Realistic</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, couple walking under autumn trees, falling leaves, warm golden light, detailed city park, photorealistic environment, hand-drawn characters, emotional atmosphere, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Autumn Couple</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, train station platform, dramatic sky with sunset clouds, power lines, detailed urban landscape, hand-drawn aesthetic, warm and cool color contrast, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Urban Sunset</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, cinematic, anime art style, girl standing on hilltop overlooking city at night, starry sky, city lights below, wind blowing hair, emotional, hand-drawn, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Night City View</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, ultra realistic, tropical beach, crystal clear water, white sand, palm trees, sunset with orange purple sky, photorealistic, 8k" data-negative="blurry, low quality, cartoon, painting, anime, ugly, deformed">Tropical Beach</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, anime art style, classroom with sunlight streaming through windows, cherry blossoms outside, peaceful atmosphere, detailed school interior, hand-drawn, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Classroom Spring</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, ultra realistic, mountain landscape, snow capped peaks, alpine lake reflection, pine trees, dramatic clouds, golden hour, photorealistic, 8k" data-negative="blurry, low quality, painting, cartoon, anime, ugly, deformed">Mountain Lake</div>
-                        <div class="preset-item" data-prompt="masterpiece, best quality, anime art style, rainy city street at night, neon reflections on wet pavement, person with umbrella, cinematic mood, hand-drawn aesthetic, highly detailed, 8k" data-negative="3d render, cgi, cartoon, flat, simple, ugly, deformed, blurry, low quality">Rainy Neon Street</div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Prompt</label>
-                    <textarea id="prompt" placeholder="Describe the image you want to create..." required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Negative Prompt</label>
-                    <input type="text" id="negativePrompt" placeholder="Optional: elements to exclude">
-                </div>
-
-                <div class="form-group">
-                    <label>Size</label>
-                    <div class="option-list" id="sizeList">
-                        <div class="option-item active" data-value="1440x720"><span class="size-icon landscape"></span> 1440x720</div>
-                        <div class="option-item" data-value="720x1440"><span class="size-icon portrait"></span> 720x1440</div>
-                        <div class="option-item" data-value="1024x720"><span class="size-icon landscape"></span> 1024x720</div>
-                        <div class="option-item" data-value="720x1024"><span class="size-icon portrait"></span> 720x1024</div>
-                        <div class="option-item" data-value="1024x1024"><span class="size-icon square"></span> 1024x1024</div>
-                        <div class="option-item" data-value="1440x1440"><span class="size-icon square"></span> 1440x1440</div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Style</label>
-                    <div class="option-list" id="styleList">
-                        <div class="option-item active" data-value="">Default</div>
-                        <div class="option-item" data-value="cinematic">Cinematic</div>
-                        <div class="option-item" data-value="anime">Anime Art</div>
-                        <div class="option-item" data-value="realistic">Realistic</div>
-                        <div class="option-item" data-value="ghibli">Ghibli</div>
-                        <div class="option-item" data-value="fantasy">Fantasy</div>
-                        <div class="option-item" data-value="noir">Noir</div>
-                        <div class="option-item" data-value="vintage">Vintage</div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-generate" id="btnGenerate">Generate Image</button>
-            </form>
-        </div>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Generating image...</p>
-        </div>
-
-        <div class="error-message" id="errorMessage"></div>
-
-        <div class="result-container" id="resultContainer"></div>
-
-        <!-- Saran Box -->
-        <div class="saran-card">
-            <div class="saran-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
-            </div>
-            <input type="text" class="saran-input" id="saranInput" placeholder="Ada saran atau request? Tulis di sini...">
-            <button class="btn-saran" onclick="kirimSaran()">Kirim</button>
-        </div>
-
-        <div class="gallery-tabs" id="galleryTabs" style="display:none;">
-            <button class="gallery-tab active" onclick="switchGallery('mine')">My Gallery</button>
-            <button class="gallery-tab" onclick="switchGallery('public')">Public Gallery</button>
-        </div>
-        <div class="history-scroll" id="historyScroll"></div>
+  <div class="panel" id="panelAbout">
+    <div class="panel-header"><h3>About Us</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+    <div class="panel-body">
+      <p><strong>NodeRouter</strong> adalah unified API gateway untuk berbagai model AI dalam satu endpoint.</p>
+      <p>Satu endpoint, semua model.</p>
+      <h4>Statistik</h4>
+      <p>400K+ token/bulan. 20+ pengguna. 3+ penyedia. 6 model.</p>
     </div>
+  </div>
 
-    <div class="preview-modal" id="previewModal"><img id="previewImage" src="" alt="Preview"></div>
+  <div class="screen" id="welcome">
+    <nav class="w-nav">
+      <div class="w-brand">
+        <img class="mark" alt="NodeRouter" src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" style="height:35px;width:35px">
+        Node<span class="accent" style="transform:translate(-5px,0);color:#000">Router</span>
+      </div>
+      <div class="w-nav-links">
+        <a onclick="openPanel('models')">Model</a>
+        <a onclick="openPanel('docs')">Dokumentasi</a>
+        <a onclick="openPanel('about')">About Us</a>
+      </div>
+    </nav>
 
-    <div class="auth-modal" id="authModal">
-        <div class="auth-card">
-            <div class="auth-title" id="authTitle">Login</div>
-            <form id="authForm">
-                <input type="text" class="auth-input" id="authUsername" placeholder="Username" required>
-                <div class="password-wrapper">
-                    <input type="password" class="auth-input" id="authPassword" placeholder="Password" required>
-                    <button type="button" class="toggle-pw" onclick="togglePassword()" tabindex="-1">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </button>
-                </div>
-                <div class="password-wrapper" id="confirmGroup" style="display:none;">
-                    <input type="password" class="auth-input" id="authConfirm" placeholder="Confirm password">
-                </div>
-                <button type="submit" class="btn-generate" style="margin-top:10px;">Submit</button>
-            </form>
-            <div class="auth-link">
-                <span id="authSwitchText">Don't have an account?</span>
-                <a id="authSwitchLink" onclick="switchAuth()">Register</a>
-            </div>
-            <div class="error-message" id="authError"></div>
-        </div>
+    <div class="w-hero">
+      <span class="w-eyebrow"><span class="led"></span>400K token dirutekan bulan ini</span>
+      <h1>The Unified Interface<br>For <span class="accent" style="color:#bdbdbd">AI Models</span></h1>
+      <p class="sub">Unlimited, <b>Free</b>, akses ke Puluhan model dari puluhan penyedia. Bandingkan Kompetitor, ganti model tanpa Pusing tagihan</p>
+      <div class="w-cta-row">
+        <button class="btn-primary" id="startedBtn">Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+        <button class="btn-secondary" id="communityBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Community</button>
+      </div>
+      <div class="w-stats">
+        <div class="w-stat"><div class="num">400K</div><div class="lbl">Token / bulan</div></div>
+        <div class="w-stat"><div class="num">20+</div><div class="lbl">Pengguna global</div></div>
+        <div class="w-stat"><div class="num">3+</div><div class="lbl">Penyedia</div></div>
+        <div class="w-stat"><div class="num accent" style="color:#000">6</div><div class="lbl">Model</div></div>
+      </div>
     </div>
+    <div class="w-foot-strip">NodeRouter &middot; satu API untuk semua model AI</div>
+  </div>
 
-    <div class="toast" id="toast"></div>
+  <div class="screen hidden" id="loading">
+    <div class="l-bg-grid"></div>
+    <div class="l-inner">
+      <div class="l-mark"><img src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" alt=""></div>
+      <div class="l-wordmark">Node<span class="accent" style="color:#000">Router</span></div>
+      <div class="l-progress-wrap">
+        <div class="l-progress-track"><div class="l-progress-fill" id="loadFill"></div></div>
+        <div class="l-progress-meta"><span id="loadLabel">Menghubungkan ke endpoint</span><span id="loadPct">0%</span></div>
+      </div>
+      <div class="l-steps" id="loadSteps">
+        <div class="l-step" data-step="0"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Mengautentikasi sesi</div>
+        <div class="l-step" data-step="1"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Menghubungkan ke endpoint router</div>
+        <div class="l-step" data-step="2"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Memuat katalog model</div>
+        <div class="l-step" data-step="3"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Menyusun contoh implementasi</div>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        function setCookie(n, v, d = 365) { const dt = new Date(); dt.setTime(dt.getTime() + (d * 24 * 60 * 60 * 1000)); document.cookie = `${n}=${v};expires=${dt.toUTCString()};path=/`; }
-        function getCookie(n) { const v = `; ${document.cookie}`; const p = v.split(`; ${n}=`); if (p.length === 2) return p.pop().split(';').shift(); return null; }
-        function deleteCookie(n) { document.cookie = `${n}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`; }
-        function getDB(k) { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch(e) { return {}; } }
-        function setDB(k, d) { localStorage.setItem(k, JSON.stringify(d)); }
+  <div class="screen hidden" id="viewer">
+    <header class="v-topbar">
+      <div class="v-brand"><img class="mark-img" src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" alt="">Node<span class="accent" style="color:#000">Router</span><span class="v-brand-tag">IMPLEMENTASI</span></div>
+      <div class="v-topbar-right"><div class="v-credit"><span class="led"></span>Online</div><div class="v-avatar">0x</div></div>
+    </header>
+    <div class="v-subbar">
+      <div class="v-subbar-left"><span class="lbl">Model aktif</span><span class="ttl" id="activeModelTitle">GPT-5.5</span></div>
+      <div class="model-select-wrap" id="modelSelectWrap">
+        <button class="model-select" id="modelSelectBtn"><span class="model-dot" id="modelDotMain" style="background:#10A37F"></span><span class="meta"><span class="mname" id="modelNameMain">GPT-5.5</span><span class="mprov" id="modelProvMain">noderouter/gpt-5.5</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+        <div class="model-dropdown" id="modelDropdown"><div class="model-dropdown-label">6 model tersedia</div><div class="model-dropdown-list" id="modelDropdownList"></div></div>
+      </div>
+    </div>
+    <div class="v-main">
+      <div class="v-code-col">
+        <div class="v-code-toolbar"><span class="label"><span class="lang-pill">JS</span><span id="codeFileLabel">gpt-5.5.fetch.js</span></span><button class="copy-code-btn" id="copyCodeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Salin</button></div>
+        <div class="v-code-scroll"><pre id="codeBlock"></pre></div>
+      </div>
+      <aside class="v-sidebar">
+        <div class="v-side-block"><div class="h">Tentang model</div><div class="v-desc-text" id="sideDesc"></div></div>
+        <div class="v-side-block"><div class="h">Spesifikasi</div>
+          <div class="v-spec-row"><span class="k">Konteks</span><span class="v" id="specCtx"></span></div>
+          <div class="v-spec-row"><span class="k">Endpoint</span><span class="v" id="specEndpoint"></span></div>
+          <div class="v-spec-row"><span class="k">Latensi tipikal</span><span class="v" id="specLatency"></span></div>
+        </div>
+        <div class="v-side-block"><div class="h">Cocok untuk</div><div class="v-tag-row" id="sideTags"></div></div>
+      </aside>
+    </div>
+  </div>
 
-        let usersDB = getDB('usersDB');
-        let resultsDB = getDB('resultsDB');
-        let publicDB = getDB('publicDB');
-        let saranDB = getDB('saranDB');
-        if (!Array.isArray(saranDB)) saranDB = [];
-        let currentUser = getCookie('ai_user');
-        let currentGallery = 'mine';
-        let selectedSize = '1440x720';
-        let selectedStyle = '';
+</div>
 
-        if (currentUser) { showLoggedIn(currentUser); document.getElementById('galleryTabs').style.display = 'flex'; renderGallery(); } else { renderPublicGallery(); }
+<script>
+(function(){
+  "use strict";
 
-        document.querySelectorAll('.preset-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); document.getElementById('prompt').value = this.dataset.prompt; document.getElementById('negativePrompt').value = this.dataset.negative || ''; }); });
-        document.querySelectorAll('#sizeList .option-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('#sizeList .option-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); selectedSize = this.dataset.value; }); });
-        document.querySelectorAll('#styleList .option-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('#styleList .option-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); selectedStyle = this.dataset.value; }); });
+  var MODELS = [
+    {id:"deepseek-reasoner",slug:"noderouter/deepseek-reasoner",name:"DeepSeek Reasoner",desc:"Model penalaran deep reasoning unggul untuk coding, matematika, dan problem-solving kompleks dengan akurasi tinggi.",color:"#4F46E5",ctx:"128K",endpoint:"/v1/completions",latency:"~820ms",tags:["Penalaran","Coding","Matematika"],file:"deepseek-reasoner.fetch.js",
+     code:'// NodeRouter - DeepSeek Reasoner\nconst E = "/v1/completions";\n\nasync function reason(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/deepseek-reasoner",\n      messages: [\n        { role: "system", content: "Kamu AI penalaran yang teliti." },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nreason("Jelaskan quicksort langkah demi langkah.").then(console.log);\n'},
+    {id:"claude-sonnet-4.5",slug:"noderouter/claude-sonnet-4.5",name:"Claude Sonnet 4.5",desc:"Model seimbang untuk percakapan natural, analisis mendalam, dan konten kreatif dengan konteks 200K token.",color:"#D97706",ctx:"200K",endpoint:"/v1/completions",latency:"~580ms",tags:["Percakapan","Analisis","Kreatif"],file:"claude-sonnet-4.5.fetch.js",
+     code:'// NodeRouter - Claude Sonnet 4.5\nconst E = "/v1/completions";\n\nasync function chat(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/claude-sonnet-4.5",\n      messages: [\n        { role: "system", content: "Kamu asisten helpful dan kreatif." },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nchat("Tulis cerpen tentang robot yang belajar melukis.").then(console.log);\n'},
+    {id:"gpt-5.5",slug:"noderouter/gpt-5.5",name:"GPT-5.5",desc:"Model general-purpose terbaru dengan performa tinggi untuk berbagai tugas: chat, ringkasan, terjemahan, dan brainstorming.",color:"#10A37F",ctx:"256K",endpoint:"/v1/completions",latency:"~490ms",tags:["General","Cepat","Multi-task"],file:"gpt-5.5.fetch.js",
+     code:'// NodeRouter - GPT-5.5\nconst E = "/v1/completions";\n\nasync function ask(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/gpt-5.5",\n      messages: [\n        { role: "system", content: "Kamu asisten AI ringkas dan informatif." },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nask("Beri 5 ide startup AI 2026.").then(console.log);\n'},
+    {id:"qwen-3.6-plus",slug:"noderouter/qwen-3.6-plus",name:"Qwen 3.6 Plus",desc:"Model multibahasa andal untuk percakapan, ringkasan dokumen, dan pemahaman teks dalam berbagai bahasa termasuk Indonesia.",color:"#6366F1",ctx:"128K",endpoint:"/v1/completions",latency:"~430ms",tags:["Multibahasa","Ringkasan","Chat"],file:"qwen-3.6-plus.fetch.js",
+     code:'// NodeRouter - Qwen 3.6 Plus\nconst E = "/v1/completions";\n\nasync function qwen(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/qwen-3.6-plus",\n      messages: [\n        { role: "system", content: "Kamu asisten multibahasa yang fasih." },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nqwen("Jelaskan gotong royong di Indonesia.").then(console.log);\n'},
+    {id:"gemini-3-pro-preview",slug:"noderouter/gemini-3-pro-preview",name:"Gemini 3 Pro",desc:"Model konteks panjang 512K token untuk analisis dokumen besar, riset mendalam, dan pemrosesan multi-file.",color:"#4285F4",ctx:"512K",endpoint:"/v1/completions",latency:"~710ms",tags:["Konteks panjang","Riset","Dokumen"],file:"gemini-3-pro-preview.fetch.js",
+     code:'// NodeRouter - Gemini 3 Pro\nconst E = "/v1/completions";\n\nasync function gemini(doc) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/gemini-3-pro-preview",\n      messages: [\n        { role: "system", content: "Ringkas dokumen terstruktur." },\n        { role: "user", content: doc },\n      ],\n      stream: true,\n    }),\n  });\n  const reader = r.body.getReader();\n  const dec = new TextDecoder();\n  let full = "";\n  while(true){const{v,d}=await reader.read();if(d)break;full+=dec.decode(v,{stream:true})}\n  return full;\n}\n'},
+    {id:"flux-schnell",slug:"noderouter/flux-schnell",name:"Flux Schnell",desc:"Model image generation cepat untuk kreasi visual, desain, dan seni digital.",color:"#EC4899",ctx:"N/A",endpoint:"/v1/images",latency:"~1.2s",tags:["Image Gen","Kreatif","Desain"],file:"flux-schnell.fetch.js",
+     code:'// NodeRouter - Flux Schnell\nconst E = "/v1/images";\n\nasync function img(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/flux-schnell",\n      prompt: p,\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.image_url;\n}\n\nimg("A futuristic city at sunset").then(u => console.log("Image:", u));\n'}
+  ];
 
-        function showLoggedIn(u) { document.getElementById('userSection').innerHTML = `<span class="user-badge">@${u}</span><button class="btn btn-danger" onclick="logout()">Logout</button>`; }
-        function logout() { deleteCookie('ai_user'); currentUser = null; document.getElementById('userSection').innerHTML = '<button class="btn btn-primary" onclick="showAuthModal(\'login\')">Login</button>'; document.getElementById('galleryTabs').style.display = 'none'; renderPublicGallery(); showToast('Logged out'); }
-        function showAuthModal(type) { document.getElementById('authModal').classList.add('active'); document.getElementById('authError').classList.remove('active'); document.getElementById('authError').style.display = 'none'; document.getElementById('authForm').reset(); if (type === 'login') { document.getElementById('authTitle').textContent = 'Login'; document.getElementById('confirmGroup').style.display = 'none'; document.getElementById('authSwitchText').textContent = "Don't have an account? "; document.getElementById('authSwitchLink').textContent = 'Register'; document.getElementById('authForm').dataset.type = 'login'; } else { document.getElementById('authTitle').textContent = 'Register'; document.getElementById('confirmGroup').style.display = 'block'; document.getElementById('authSwitchText').textContent = 'Already have an account? '; document.getElementById('authSwitchLink').textContent = 'Login'; document.getElementById('authForm').dataset.type = 'register'; } }
-        function switchAuth() { const t = document.getElementById('authForm').dataset.type; showAuthModal(t === 'login' ? 'register' : 'login'); }
-        function togglePassword() { const pw = document.getElementById('authPassword'); const cf = document.getElementById('authConfirm'); pw.type = pw.type === 'password' ? 'text' : 'password'; if (cf) cf.type = cf.type === 'password' ? 'text' : 'password'; }
+  var state = { modelIndex:2 };
+  var currentPanel = null;
 
-        document.getElementById('authForm').addEventListener('submit', function(e) {
-            e.preventDefault(); const type = this.dataset.type; const u = document.getElementById('authUsername').value.trim(); const p = document.getElementById('authPassword').value.trim(); const c = document.getElementById('authConfirm').value.trim(); const ae = document.getElementById('authError'); ae.classList.remove('active'); ae.style.display = 'none';
-            if (!u || !p) return showAuthError('All fields required!'); if (u.length < 3) return showAuthError('Username min 3 chars!'); if (p.length < 4) return showAuthError('Password min 4 chars!');
-            usersDB = getDB('usersDB');
-            if (type === 'register') { if (p !== c) return showAuthError('Passwords do not match!'); if (usersDB[u]) return showAuthError('Username already exists!'); usersDB[u] = { password: p, created: new Date().toISOString() }; setDB('usersDB', usersDB); setCookie('ai_user', u); currentUser = u; finishAuth('Registered successfully!'); }
-            else { if (!usersDB[u] || usersDB[u].password !== p) return showAuthError('Wrong username or password!'); setCookie('ai_user', u); currentUser = u; finishAuth('Logged in!'); }
-        });
-        function finishAuth(msg) { showLoggedIn(currentUser); document.getElementById('authModal').classList.remove('active'); document.getElementById('galleryTabs').style.display = 'flex'; currentGallery = 'mine'; document.querySelectorAll('.gallery-tab').forEach((t, i) => t.classList.toggle('active', i === 0)); renderGallery(); showToast(msg); }
-        function showAuthError(msg) { const ae = document.getElementById('authError'); ae.textContent = msg; ae.classList.add('active'); ae.style.display = 'block'; }
-        document.getElementById('authModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+  window.openPanel = function(name){
+    if(currentPanel) closePanel();
+    var cap = name.charAt(0).toUpperCase() + name.slice(1);
+    var panel = document.getElementById('panel' + cap);
+    if(!panel) return;
+    if(name === 'models') renderPanelModels();
+    panel.classList.add('active');
+    document.getElementById('overlay').classList.add('active');
+    currentPanel = name;
+  };
 
-        function kirimSaran() {
-            const pesan = document.getElementById('saranInput').value.trim();
-            if (!pesan) return showToast('Tulis saran dulu!', true);
-            saranDB = getDB('saranDB'); if (!Array.isArray(saranDB)) saranDB = [];
-            saranDB.push({ nama: currentUser || 'Anonim', pesan, timestamp: new Date().toISOString() });
-            setDB('saranDB', saranDB);
-            document.getElementById('saranInput').value = '';
-            showToast('Saran terkirim!');
-        }
+  window.closePanel = function(){
+    if(currentPanel){
+      var cap = currentPanel.charAt(0).toUpperCase() + currentPanel.slice(1);
+      document.getElementById('panel' + cap).classList.remove('active');
+      document.getElementById('overlay').classList.remove('active');
+      currentPanel = null;
+    }
+  };
 
-        document.getElementById('generateForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); if (!currentUser) { showToast('Please login first!', true); showAuthModal('login'); return; }
-            const prompt = document.getElementById('prompt').value.trim(); const negativePrompt = document.getElementById('negativePrompt').value.trim(); const btnGenerate = document.getElementById('btnGenerate'); const loading = document.getElementById('loading'); const errorMessage = document.getElementById('errorMessage'); const resultContainer = document.getElementById('resultContainer');
-            errorMessage.classList.remove('active'); resultContainer.innerHTML = '';
-            if (!prompt) { showError('Prompt cannot be empty!'); return; }
-            const stylePrefixes = { cinematic: 'masterpiece, best quality, cinematic lighting, anime art style, hand-drawn aesthetic, highly detailed, 8k, ', anime: 'masterpiece, best quality, anime art style, hand-drawn, vibrant colors, highly detailed, 8k, ', realistic: 'masterpiece, best quality, ultra realistic, photorealistic, highly detailed, 8k, ', ghibli: 'masterpiece, best quality, Studio Ghibli art style, hand-drawn animation, soft pastel colors, dreamy atmosphere, 8k, ', fantasy: 'masterpiece, best quality, fantasy art, magical atmosphere, detailed, ethereal lighting, 8k, ', noir: 'masterpiece, best quality, film noir style, high contrast, dramatic shadows, moody atmosphere, black and white, 8k, ', vintage: 'masterpiece, best quality, vintage aesthetic, retro color palette, film grain, nostalgic atmosphere, 8k, ', '': '' };
-            const finalPrompt = (stylePrefixes[selectedStyle] || '') + prompt;
-            loading.classList.add('active'); btnGenerate.disabled = true; btnGenerate.textContent = 'Generating...';
-            try {
-                const response = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: finalPrompt, negativePrompt, size: selectedSize, jumlah: 1, username: currentUser }) });
-                const data = await response.json();
-                if (data.success && data.images && data.images.length > 0) { const img = data.images[0]; resultContainer.innerHTML = `<div class="result-wrapper"><img src="${img.url}" alt="Generated" class="result-image" onclick="openPreview('${img.url}')" loading="lazy"><span class="result-user">@${currentUser}</span></div>`; resultsDB = getDB('resultsDB'); if (!resultsDB[currentUser]) resultsDB[currentUser] = []; resultsDB[currentUser].unshift({ url: img.url, prompt: finalPrompt, size: selectedSize, timestamp: new Date().toISOString(), public: false }); if (resultsDB[currentUser].length > 50) resultsDB[currentUser] = resultsDB[currentUser].slice(0, 50); setDB('resultsDB', resultsDB); renderGallery(); showToast('Image generated!'); }
-                else { showError(data.message || 'Failed to generate'); }
-            } catch (error) { showError('Network error, please try again'); }
-            finally { loading.classList.remove('active'); btnGenerate.disabled = false; btnGenerate.textContent = 'Generate Image'; }
-        });
+  document.getElementById('overlay').addEventListener('click', closePanel);
 
-        function switchGallery(type) { currentGallery = type; document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderGallery(); }
-        function renderGallery() { if (!currentUser) return renderPublicGallery(); resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const c = document.getElementById('historyScroll'); let items = currentGallery === 'mine' ? (resultsDB[currentUser] || []).map(r => ({ ...r, user: currentUser })) : Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); c.innerHTML = items.length === 0 ? '<p style="color:#888;padding:20px;">No images yet</p>' : items.map((r, i) => `<div class="history-card"><img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy"><div class="card-info"><div class="card-user">@${r.user}</div><div class="card-prompt">${escapeHtml(r.prompt || '')}</div><div class="card-actions"><button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button><button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button>${currentGallery === 'mine' ? `<button class="btn-sm btn-sm-pub" onclick="event.stopPropagation();togglePublic('${currentUser}', ${i})">${r.public ? 'Unpub' : 'Pub'}</button><button class="btn-sm btn-sm-del" onclick="event.stopPropagation();deleteMyImage(${i})">X</button>` : ''}</div></div></div>`).join(''); }
-        function renderPublicGallery() { publicDB = getDB('publicDB'); const c = document.getElementById('historyScroll'); let items = Object.keys(publicDB).map(u => publicDB[u].map(r => ({ ...r, user: u }))).flat().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); c.innerHTML = items.length === 0 ? '<p style="color:#888;padding:20px;">No public images</p>' : items.map(r => `<div class="history-card"><img src="${r.url}" alt="Image" onclick="openPreview('${r.url}')" loading="lazy"><div class="card-info"><div class="card-user">@${r.user}</div><div class="card-prompt">${escapeHtml(r.prompt || '')}</div><div class="card-actions"><button class="btn-sm btn-sm-copy" onclick="event.stopPropagation();copyText('${escapeHtml(r.prompt || '')}')">Copy</button><button class="btn-sm btn-sm-dl" onclick="event.stopPropagation();downloadImage('${r.url}')">DL</button></div></div></div>`).join(''); }
-        function togglePublic(user, idx) { resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const item = resultsDB[user][idx]; item.public = !item.public; resultsDB[user][idx] = item; setDB('resultsDB', resultsDB); if (item.public) { if (!publicDB[user]) publicDB[user] = []; publicDB[user].push(item); } else { if (publicDB[user]) publicDB[user] = publicDB[user].filter(p => p.url !== item.url); } setDB('publicDB', publicDB); renderGallery(); showToast(item.public ? 'Published!' : 'Unpublished'); }
-        function deleteMyImage(idx) { if (!confirm('Delete this image?')) return; resultsDB = getDB('resultsDB'); publicDB = getDB('publicDB'); const item = resultsDB[currentUser][idx]; resultsDB[currentUser].splice(idx, 1); setDB('resultsDB', resultsDB); if (publicDB[currentUser]) { publicDB[currentUser] = publicDB[currentUser].filter(p => p.url !== item.url); setDB('publicDB', publicDB); } renderGallery(); showToast('Deleted!'); }
+  function renderPanelModels(){
+    var grid = document.getElementById('panelModelGrid');
+    if(!grid) return;
+    grid.innerHTML = MODELS.map(function(m){
+      return '<div class="model-card"><div class="mc-top"><span class="mc-dot" style="background:'+m.color+'"></span><span class="mc-name">'+m.name+'</span></div><span class="mc-slug">'+m.slug+'</span><span class="mc-desc">'+m.desc+'</span><div class="mc-tags">'+m.tags.map(function(t){return '<span class="mc-tag">'+t+'</span>';}).join('')+'</div></div>';
+    }).join('');
+  }
 
-        function openPreview(url) { document.getElementById('previewImage').src = url; document.getElementById('previewModal').classList.add('active'); }
-        document.getElementById('previewModal').addEventListener('click', function() { this.classList.remove('active'); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { document.getElementById('previewModal').classList.remove('active'); document.getElementById('authModal').classList.remove('active'); } });
-        async function downloadImage(url) { try { const r = await fetch(url); const b = await r.blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `image_${Date.now()}.jpg`; a.click(); URL.revokeObjectURL(a.href); showToast('Downloading...'); } catch(e) { window.open(url, '_blank'); } }
-        function copyText(t) { navigator.clipboard.writeText(t).then(() => showToast('Copied!')).catch(() => showToast('Copy failed')); }
-        function showError(msg) { const el = document.getElementById('errorMessage'); el.textContent = msg; el.classList.add('active'); setTimeout(() => el.classList.remove('active'), 5000); }
-        function showToast(msg, isError = false) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast' + (isError ? ' error' : ''); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
-        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-    </script>
+  var welcomeEl = document.getElementById('welcome');
+  var loadingEl = document.getElementById('loading');
+  var viewerEl = document.getElementById('viewer');
+
+  function goToLoading(){
+    welcomeEl.classList.add('leaving');
+    setTimeout(function(){ welcomeEl.classList.add('hidden'); loadingEl.classList.remove('hidden'); runLoadingSequence(); }, 480);
+  }
+
+  document.getElementById('startedBtn').addEventListener('click', goToLoading);
+
+  document.getElementById('communityBtn').addEventListener('click', function(){
+    var btn = this; var orig = btn.innerHTML;
+    btn.textContent = 'Segera hadir'; btn.disabled = true;
+    setTimeout(function(){ btn.innerHTML = orig; btn.disabled = false; }, 1300);
+  });
+
+  var loadFill = document.getElementById('loadFill');
+  var loadPct = document.getElementById('loadPct');
+  var loadLabel = document.getElementById('loadLabel');
+  var stepEls = [].slice.call(document.querySelectorAll('.l-step'));
+  var stepLabels = ["Mengautentikasi sesi","Menghubungkan ke endpoint router","Memuat katalog model","Menyusun contoh implementasi"];
+
+  function runLoadingSequence(){
+    loadFill.style.width = '0%'; loadPct.textContent = '0%';
+    stepEls.forEach(function(s){ s.classList.remove('active','done'); });
+    var totalMs = 8000, start = performance.now(), msPer = totalMs / 4;
+    function tick(now){
+      var el = now - start, pct = Math.min(100, (el / totalMs) * 100);
+      loadFill.style.width = pct.toFixed(0) + '%'; loadPct.textContent = pct.toFixed(0) + '%';
+      var cs = Math.min(3, Math.floor(el / msPer));
+      loadLabel.textContent = stepLabels[cs];
+      stepEls.forEach(function(s,i){ s.classList.toggle('done', i < cs); s.classList.toggle('active', i === cs && el < totalMs); });
+      if(el < totalMs) requestAnimationFrame(tick);
+      else { stepEls.forEach(function(s){ s.classList.add('done'); s.classList.remove('active'); }); loadLabel.textContent = 'Siap'; setTimeout(goToViewer, 380); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function goToViewer(){
+    loadingEl.classList.add('leaving');
+    setTimeout(function(){ loadingEl.classList.add('hidden'); viewerEl.classList.remove('hidden'); initViewer(); }, 520);
+  }
+
+  var modelSelectWrap, modelSelectBtn, modelDropdown, modelDropdownList;
+  var viewerInited = false;
+
+  function initViewer(){
+    if(viewerInited){ renderAll(); return; }
+    viewerInited = true;
+
+    modelSelectWrap = document.getElementById('modelSelectWrap');
+    modelSelectBtn = document.getElementById('modelSelectBtn');
+    modelDropdown = document.getElementById('modelDropdown');
+    modelDropdownList = document.getElementById('modelDropdownList');
+
+    MODELS.forEach(function(m, i){
+      var opt = document.createElement('button');
+      opt.className = 'model-option' + (i === state.modelIndex ? ' selected' : '');
+      opt.setAttribute('role','option'); opt.dataset.index = i;
+      opt.innerHTML = '<span class="model-dot" style="background:'+m.color+'"></span><span class="meta"><span class="mname">'+m.name+'</span><span class="mdesc">'+m.desc.split('.')[0]+'.</span></span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      opt.addEventListener('click', function(){ selectModel(i); closeDropdown(); });
+      modelDropdownList.appendChild(opt);
+    });
+
+    modelSelectBtn.addEventListener('click', function(e){ e.stopPropagation(); modelSelectWrap.classList.contains('open') ? closeDropdown() : openDropdown(); });
+    document.addEventListener('click', function(e){ if(modelSelectWrap && !modelSelectWrap.contains(e.target)) closeDropdown(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeDropdown(); });
+
+    document.getElementById('copyCodeBtn').addEventListener('click', function(){
+      var btn = this, text = currentModel().code;
+      var done = function(){ var o = btn.innerHTML; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Tersalin'; setTimeout(function(){ btn.innerHTML = o; }, 1400); };
+      if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(done); else done();
+    });
+
+    renderAll();
+  }
+
+  function openDropdown(){ modelSelectWrap.classList.add('open'); modelSelectBtn.setAttribute('aria-expanded','true'); }
+  function closeDropdown(){ if(modelSelectWrap){ modelSelectWrap.classList.remove('open'); modelSelectBtn.setAttribute('aria-expanded','false'); } }
+  function selectModel(i){ state.modelIndex = i; document.querySelectorAll('.model-option').forEach(function(n,idx){ n.classList.toggle('selected', idx === i); }); renderAll(); }
+  function currentModel(){ return MODELS[state.modelIndex]; }
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function highlight(code){
+    return code.split('\n').map(function(line){
+      var l = esc(line);
+      l = l.replace(/(\/\/.*$)/g, '<span class="tok-com">$1</span>');
+      l = l.replace(/(&quot;.*?&quot;|'[^']*'|`[^`]*`)/g, '<span class="tok-str">$1</span>');
+      l = l.replace(/\b(const|let|var|async|await|function|return|new|import|from|require|export|default|if|else|for|of|in|true|false|null)\b/g, '<span class="tok-kw">$1</span>');
+      l = l.replace(/\b(NodeRouter|AbortController|Promise|Error)\b/g, '<span class="tok-class">$1</span>');
+      l = l.replace(/\b([a-zA-Z_$][\w$]*)(?=\()/g, function(m,p1){ return /^(console|JSON|fetch|Error)$/.test(p1) ? m : '<span class="tok-fn">'+p1+'</span>'; });
+      l = l.replace(/:\s*([a-zA-Z_][\w$]*)(?=[,\n]|$)/g, function(m,p1){ return ': <span class="tok-prop">'+p1+'</span>'; });
+      l = l.replace(/\b(\d+\.?\d*)\b/g, '<span class="tok-num">$1</span>');
+      return l;
+    }).join('\n');
+  }
+
+  function renderCode(){
+    var m = currentModel(), highlighted = highlight(m.code), lines = highlighted.split('\n');
+    var rows = lines.map(function(lineHtml, i){
+      return '<span class="v-code-row"><span class="ln">'+(i+1)+'</span><span class="ln-pad-left"></span><span class="code-line">'+(lineHtml.length ? lineHtml : ' ')+'</span></span>';
+    }).join('');
+    document.getElementById('codeBlock').innerHTML = '<span class="v-code-table">'+rows+'</span>';
+    document.getElementById('codeFileLabel').textContent = m.file;
+  }
+
+  function renderAll(){
+    var m = currentModel();
+    document.getElementById('modelDotMain').style.background = m.color;
+    document.getElementById('modelNameMain').textContent = m.name;
+    document.getElementById('modelProvMain').textContent = m.slug;
+    document.getElementById('activeModelTitle').textContent = m.name;
+    document.getElementById('sideDesc').textContent = m.desc;
+    document.getElementById('specCtx').textContent = m.ctx;
+    document.getElementById('specEndpoint').textContent = m.endpoint;
+    document.getElementById('specLatency').textContent = m.latency;
+    var tagWrap = document.getElementById('sideTags'); tagWrap.innerHTML = '';
+    m.tags.forEach(function(t){ var el = document.createElement('span'); el.className = 'v-tag'; el.textContent = t; tagWrap.appendChild(el); });
+    renderCode();
+  }
+
+})();
+</script>
+
 </body>
 </html>
