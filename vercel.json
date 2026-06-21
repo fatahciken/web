@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/v1/completions", "destination": "/api/completions" },
+    { "source": "/v1/images", "destination": "/api/images" }
+  ]
+}
