@@ -19,13 +19,13 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "model and messages required" });
     }
 
-    const handler = MODEL_MAP[model];
-    if (!handler) {
-        return res.status(404).json({ error: `Unknown model: ${model}` });
+    const handlerFn = MODEL_MAP[model];
+    if (!handlerFn) {
+        return res.status(404).json({ error: "Unknown model: " + model });
     }
 
     try {
-        const content = await handler(messages);
+        const content = await handlerFn(messages, model);
         return res.json({ content });
     } catch (e) {
         return res.status(500).json({ error: e.message });
