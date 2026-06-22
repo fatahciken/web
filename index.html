@@ -108,7 +108,6 @@ button{font-family:inherit;cursor:pointer;}
 .model-option.selected .check{opacity:1;}
 .v-main{flex:1 1 auto;display:flex;min-height:0;}
 .v-code-col{flex:1 1 auto;display:flex;flex-direction:column;min-width:0;}
-.fetch-pill{font-family:var(--mono);font-size:10px;color:#E4E4E7;background:#1C1C1F;border:1px solid #2A2A2D;padding:2px 8px;border-radius:5px;font-weight:600;letter-spacing:.02em;}
 .v-code-toolbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:11px 20px;background:#0A0A0B;border-bottom:1px solid #1E1E20;}
 .v-code-toolbar .label{font-family:var(--mono);font-size:11px;color:#8A8A8E;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
 .lang-pill{font-family:var(--mono);font-size:10px;color:#0A0A0A;background:#F2C744;padding:2px 7px;border-radius:5px;font-weight:700;}
@@ -138,6 +137,14 @@ button{font-family:inherit;cursor:pointer;}
 .v-desc-text{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
 .v-tag-row{display:flex;gap:6px;flex-wrap:wrap;}
 .v-tag{font-size:10.5px;font-weight:600;color:var(--ink-soft);background:#F4F4F3;border:1px solid var(--hair);padding:4px 9px;border-radius:99px;}
+
+/* Mobile model info */
+.mobile-info{display:none;padding:18px 20px 22px;border-top:1px solid var(--hair);background:var(--bg);flex-direction:column;gap:14px;}
+.mobile-info .mi-name{font-size:16px;font-weight:800;letter-spacing:-0.02em;}
+.mobile-info .mi-desc{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+.mobile-info .mi-specs{display:flex;gap:20px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:var(--muted);}
+.mobile-info .mi-tags{display:flex;gap:6px;flex-wrap:wrap;}
+
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .overlay.active{opacity:1;pointer-events:auto;}
 .panel{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:92vw;background:#fff;z-index:100;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.12);}
@@ -160,8 +167,27 @@ button{font-family:inherit;cursor:pointer;}
 .model-card .mc-desc{font-size:11.5px;color:var(--muted);line-height:1.5;}
 .model-card .mc-tags{display:flex;gap:4px;flex-wrap:wrap;}
 .model-card .mc-tag{font-size:10px;background:#f4f4f3;padding:2px 7px;border-radius:99px;color:var(--ink-soft);}
-@media (max-width:880px){.v-sidebar{display:none;}.panel{width:100%;max-width:100%;}.model-grid{grid-template-columns:1fr;}}
-@media (max-width:680px){#app{overflow:auto;}.screen{position:relative;min-height:100vh;min-height:100dvh;}.screen.hidden{display:none;}#welcome{overflow:visible;}.w-nav{padding:12px 14px;}.w-nav-links{gap:14px;font-size:11px;}.w-brand{font-size:14px;}.w-brand .mark{width:20px;height:20px;}.w-hero{padding:36px 14px 28px;}.w-hero h1{font-size:26px;}.w-hero p.sub{font-size:13px;margin:14px 0 0;}.w-stats{grid-template-columns:repeat(2,1fr);margin-top:28px;}.w-stat{padding:14px 6px;border-bottom:1px solid var(--hair);}.w-stat .num{font-size:20px;}.w-stat .lbl{font-size:10px;}.btn-primary,.btn-secondary{font-size:12px;padding:10px 16px;}.w-foot-strip{font-size:10px;padding:12px 14px 18px;}.v-topbar{padding:0 12px;height:48px;}.v-brand{font-size:13px;gap:6px;}.v-brand .mark-img{width:20px;height:20px;}.v-brand-tag{display:none;}.v-credit{display:none;}.v-avatar{width:24px;height:24px;font-size:10px;}.v-subbar{padding:8px 12px;gap:8px;}.model-select{min-width:0;padding:6px 8px;font-size:11px;}.model-select .meta .mname{max-width:80px;font-size:11px;}.model-dropdown{width:240px;right:-8px;}.v-code-scroll{padding:12px 10px 24px 0;}.v-code-toolbar{padding:8px 12px;}.v-code-toolbar .label{font-size:9px;gap:4px;}.lang-pill{font-size:8px;padding:1px 5px;}.copy-code-btn{font-size:10px;padding:4px 8px;}.v-code-scroll pre{font-size:10px;}.v-code-row .ln{font-size:10px;padding:0 8px 0 0;}.v-code-row .code-line{font-size:10px;}.v-code-row .ln-pad-left{width:12px;}.l-inner{padding:20px;gap:20px;}.l-mark{width:44px;height:44px;}.l-wordmark{font-size:18px;}.l-step{font-size:11px;}}
+@media (max-width:880px){
+  .v-sidebar{display:none;}
+  .mobile-info{display:flex;}
+  .panel{width:100%;max-width:100%;}
+  .model-grid{grid-template-columns:1fr;}
+}
+@media (max-width:680px){
+  #app{overflow:auto;}.screen{position:relative;min-height:100vh;min-height:100dvh;}.screen.hidden{display:none;}
+  #welcome{overflow:visible;}.w-nav{padding:12px 14px;}.w-nav-links{gap:14px;font-size:11px;}.w-brand{font-size:14px;}.w-brand .mark{width:20px;height:20px;}
+  .w-hero{padding:36px 14px 28px;}.w-hero h1{font-size:26px;}.w-hero p.sub{font-size:13px;margin:14px 0 0;}
+  .w-stats{grid-template-columns:repeat(2,1fr);margin-top:28px;}.w-stat{padding:14px 6px;border-bottom:1px solid var(--hair);}.w-stat .num{font-size:20px;}.w-stat .lbl{font-size:10px;}
+  .btn-primary,.btn-secondary{font-size:12px;padding:10px 16px;}.w-foot-strip{font-size:10px;padding:12px 14px 18px;}
+  .v-topbar{padding:0 12px;height:48px;}.v-brand{font-size:13px;gap:6px;}.v-brand .mark-img{width:20px;height:20px;}.v-brand-tag{display:none;}
+  .v-credit{display:none;}.v-avatar{width:24px;height:24px;font-size:10px;}.v-subbar{padding:8px 12px;gap:8px;}
+  .model-select{min-width:0;padding:6px 8px;font-size:11px;}.model-select .meta .mname{max-width:80px;font-size:11px;}
+  .model-dropdown{width:240px;right:-8px;}.v-code-scroll{padding:12px 10px 24px 0;}.v-code-toolbar{padding:8px 12px;}
+  .v-code-toolbar .label{font-size:9px;gap:4px;}.lang-pill{font-size:8px;padding:1px 5px;}.copy-code-btn{font-size:10px;padding:4px 8px;}
+  .v-code-scroll pre{font-size:10px;}.v-code-row .ln{font-size:10px;padding:0 8px 0 0;}.v-code-row .code-line{font-size:10px;}.v-code-row .ln-pad-left{width:12px;}
+  .l-inner{padding:20px;gap:20px;}.l-mark{width:44px;height:44px;}.l-wordmark{font-size:18px;}.l-step{font-size:11px;}
+  .mobile-info{padding:14px 16px 18px;gap:10px;}
+}
 </style>
 </head>
 <body>
@@ -177,7 +203,7 @@ button{font-family:inherit;cursor:pointer;}
 <div class="panel-header"><h3>Dokumentasi</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
 <div class="panel-body">
 <h4>Base URL</h4><pre>https://noderouter.ldop.com</pre>
-<h4>Chat Completions (SSE Streaming)</h4>
+<h4>Chat Completions (SSE)</h4>
 <pre>POST /v1/completions
 Content-Type: application/json
 
@@ -192,10 +218,7 @@ Content-Type: application/json
 <pre>POST /v1/images
 Content-Type: application/json
 
-{
-  "model": "noderouter/flux-schnell",
-  "prompt": "A beautiful sunset"
-}</pre>
+{ "model": "noderouter/flux-schnell", "prompt": "..." }</pre>
 <h4>Response (SSE)</h4>
 <pre>data: {"content":"..."}
 data: [DONE]</pre>
@@ -204,11 +227,7 @@ data: [DONE]</pre>
 
 <div class="panel" id="panelAbout">
 <div class="panel-header"><h3>About Us</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
-<div class="panel-body">
-<p><strong>NodeRouter</strong> adalah unified API gateway untuk berbagai model AI dalam satu endpoint.</p>
-<p>Satu endpoint, semua model. Streaming SSE.</p>
-<h4>Statistik</h4><p>400K+ token/bulan. 20+ pengguna. 3+ penyedia. 5 model.</p>
-</div>
+<div class="panel-body"><p><strong>NodeRouter</strong> adalah unified API gateway untuk berbagai model AI dalam satu endpoint.</p><p>Satu endpoint, semua model. Streaming SSE.</p><h4>Statistik</h4><p>400K+ token/bulan. 20+ pengguna. 3+ penyedia. 5 model.</p></div>
 </div>
 
 <div class="screen" id="welcome">
@@ -258,13 +277,19 @@ data: [DONE]</pre>
 <div class="v-subbar-left"><span class="lbl">Model aktif</span><span class="ttl" id="activeModelTitle">GPT-5.5</span></div>
 <div class="model-select-wrap" id="modelSelectWrap">
 <button class="model-select" id="modelSelectBtn"><span class="model-dot" id="modelDotMain" style="background:#10A37F"></span><span class="meta"><span class="mname" id="modelNameMain">GPT-5.5</span><span class="mprov" id="modelProvMain">noderouter/gpt-5.5</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
-<div class="model-dropdown" id="modelDropdown"><div class="model-dropdown-label">6 model tersedia</div><div class="model-dropdown-list" id="modelDropdownList"></div></div>
+<div class="model-dropdown" id="modelDropdown"><div class="model-dropdown-label">5 model tersedia</div><div class="model-dropdown-list" id="modelDropdownList"></div></div>
 </div>
 </div>
 <div class="v-main">
 <div class="v-code-col">
 <div class="v-code-toolbar"><span class="label"><span class="lang-pill">JS</span><span id="codeFileLabel">gpt-5.5.fetch.js</span></span><button class="copy-code-btn" id="copyCodeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Salin</button></div>
 <div class="v-code-scroll"><pre id="codeBlock"></pre></div>
+<div class="mobile-info" id="mobileInfo">
+<div class="mi-name" id="miName"></div>
+<div class="mi-desc" id="miDesc"></div>
+<div class="mi-specs"><span id="miCtx"></span><span id="miEndpoint"></span><span id="miLatency"></span></div>
+<div class="mi-tags" id="miTags"></div>
+</div>
 </div>
 <aside class="v-sidebar">
 <div class="v-side-block"><div class="h">Tentang model</div><div class="v-desc-text" id="sideDesc"></div></div>
@@ -287,17 +312,15 @@ data: [DONE]</pre>
 
   var MODELS = [
     {id:"deepseek-reasoner",slug:"noderouter/deepseek-reasoner",name:"DeepSeek Reasoner",desc:"Model penalaran deep reasoning unggul untuk coding, matematika, dan problem-solving kompleks dengan akurasi tinggi.",color:"#4F46E5",ctx:"128K",endpoint:"/v1/completions",latency:"~820ms",tags:["Penalaran","Coding","Matematika"],file:"deepseek-reasoner.fetch.js",
-     code:'// NodeRouter - DeepSeek Reasoner (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/deepseek-reasoner",messages:[{role:"system",content:""},{role:"user",content:"Jelaskan quicksort langkah demi langkah."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
+     code:'// NodeRouter \u2014 DeepSeek Reasoner (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/deepseek-reasoner",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Jelaskan quicksort langkah demi langkah." }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
     {id:"grok-4-fast-reasoning",slug:"noderouter/grok-4-fast-reasoning",name:"Grok 4 Fast Reasoning",desc:"Model reasoning cepat dari xAI, unggul untuk problem-solving dan analisis real-time.",color:"#1DA1F2",ctx:"128K",endpoint:"/v1/completions",latency:"~650ms",tags:["Reasoning","Cepat","Real-time"],file:"grok-4-fast-reasoning.fetch.js",
-     code:'// NodeRouter - Grok 4 Fast Reasoning (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/grok-4-fast-reasoning",messages:[{role:"system",content:""},{role:"user",content:"Apa solusi terbaik untuk kemacetan Jakarta?"}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
+     code:'// NodeRouter \u2014 Grok 4 Fast Reasoning (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/grok-4-fast-reasoning",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Apa solusi terbaik untuk kemacetan Jakarta?" }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
     {id:"gpt-5.5",slug:"noderouter/gpt-5.5",name:"GPT-5.5",desc:"Model general-purpose terbaru dengan performa tinggi untuk berbagai tugas: chat, ringkasan, terjemahan, dan brainstorming.",color:"#10A37F",ctx:"256K",endpoint:"/v1/completions",latency:"~490ms",tags:["General","Cepat","Multi-task"],file:"gpt-5.5.fetch.js",
-     code:'// NodeRouter - GPT-5.5 (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/gpt-5.5",messages:[{role:"system",content:""},{role:"user",content:"Beri 5 ide startup AI 2026."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
+     code:'// NodeRouter \u2014 GPT-5.5 (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/gpt-5.5",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Beri 5 ide startup AI 2026." }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
     {id:"qwen-3.6-plus",slug:"noderouter/qwen-3.6-plus",name:"Qwen 3.6 Plus",desc:"Model multibahasa andal untuk percakapan, ringkasan dokumen, dan pemahaman teks dalam berbagai bahasa termasuk Indonesia.",color:"#6366F1",ctx:"128K",endpoint:"/v1/completions",latency:"~430ms",tags:["Multibahasa","Ringkasan","Chat"],file:"qwen-3.6-plus.fetch.js",
-     code:'// NodeRouter - Qwen 3.6 Plus (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/qwen-3.6-plus",messages:[{role:"system",content:""},{role:"user",content:"Jelaskan budaya gotong royong di Indonesia."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
-    {id:"gemini-2.5-flash",slug:"noderouter/gemini-2.5-flash",name:"Gemini 2.5 Flash",desc:"Model cepat Google dengan konteks 1M token, cocok untuk tugas harian dan analisis cepat.",color:"#4285F4",ctx:"512K",endpoint:"/v1/completions",latency:"~550ms",tags:["Cepat","Konteks panjang","Google"],file:"gemini-2.5-flash.fetch.js",
-     code:'// NodeRouter - Gemini 2.5 Flash (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/gemini-2.5-flash",messages:[{role:"system",content:""},{role:"user",content:"Ringkas manfaat AI untuk UMKM."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
+     code:'// NodeRouter \u2014 Qwen 3.6 Plus (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/qwen-3.6-plus",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Jelaskan budaya gotong royong di Indonesia." }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
     {id:"flux-schnell",slug:"noderouter/flux-schnell",name:"Flux Schnell",desc:"Model image generation cepat untuk kreasi visual, desain, dan seni digital.",color:"#EC4899",ctx:"N/A",endpoint:"/v1/images",latency:"~1.2s",tags:["Image Gen","Kreatif","Desain"],file:"flux-schnell.fetch.js",
-     code:'// NodeRouter - Flux Schnell\nconst E = "'+API_BASE+'/v1/images";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/flux-schnell",prompt:"A futuristic city at sunset"})\n}).then(r=>r.json()).then(d=>console.log("Image:",d.image_url));\n'}
+     code:'// NodeRouter \u2014 Flux Schnell\nconst E = "'+API_BASE+'/v1/images";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/flux-schnell",\n    prompt: "A futuristic city at sunset"\n  })\n}).then(r => r.json()).then(d => console.log("Image:", d.image_url));\n'}
   ];
 
   var state = { modelIndex:2 };
@@ -443,12 +466,24 @@ data: [DONE]</pre>
     document.getElementById('modelNameMain').textContent = m.name;
     document.getElementById('modelProvMain').textContent = m.slug;
     document.getElementById('activeModelTitle').textContent = m.name;
+
+    // Desktop sidebar
     document.getElementById('sideDesc').textContent = m.desc;
     document.getElementById('specCtx').textContent = m.ctx;
     document.getElementById('specEndpoint').textContent = m.endpoint;
     document.getElementById('specLatency').textContent = m.latency;
     var tagWrap = document.getElementById('sideTags'); tagWrap.innerHTML = '';
     m.tags.forEach(function(t){ var el = document.createElement('span'); el.className = 'v-tag'; el.textContent = t; tagWrap.appendChild(el); });
+
+    // Mobile info
+    document.getElementById('miName').textContent = m.name;
+    document.getElementById('miDesc').textContent = m.desc;
+    document.getElementById('miCtx').textContent = 'Konteks: ' + m.ctx;
+    document.getElementById('miEndpoint').textContent = 'Endpoint: ' + m.endpoint;
+    document.getElementById('miLatency').textContent = 'Latensi: ' + m.latency;
+    var miTags = document.getElementById('miTags'); miTags.innerHTML = '';
+    m.tags.forEach(function(t){ var el = document.createElement('span'); el.className = 'v-tag'; el.textContent = t; miTags.appendChild(el); });
+
     renderCode();
   }
 
