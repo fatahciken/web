@@ -137,14 +137,11 @@ button{font-family:inherit;cursor:pointer;}
 .v-desc-text{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
 .v-tag-row{display:flex;gap:6px;flex-wrap:wrap;}
 .v-tag{font-size:10.5px;font-weight:600;color:var(--ink-soft);background:#F4F4F3;border:1px solid var(--hair);padding:4px 9px;border-radius:99px;}
-
-/* Mobile model info */
 .mobile-info{display:none;padding:18px 20px 22px;border-top:1px solid var(--hair);background:var(--bg);flex-direction:column;gap:14px;}
 .mobile-info .mi-name{font-size:16px;font-weight:800;letter-spacing:-0.02em;}
 .mobile-info .mi-desc{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
 .mobile-info .mi-specs{display:flex;gap:20px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:var(--muted);}
 .mobile-info .mi-tags{display:flex;gap:6px;flex-wrap:wrap;}
-
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .overlay.active{opacity:1;pointer-events:auto;}
 .panel{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:92vw;background:#fff;z-index:100;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.12);}
@@ -203,7 +200,7 @@ button{font-family:inherit;cursor:pointer;}
 <div class="panel-header"><h3>Dokumentasi</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
 <div class="panel-body">
 <h4>Base URL</h4><pre>https://noderouter.ldop.com</pre>
-<h4>Chat Completions (SSE)</h4>
+<h4>Chat Completions (SSE Streaming)</h4>
 <pre>POST /v1/completions
 Content-Type: application/json
 
@@ -310,17 +307,77 @@ data: [DONE]</pre>
 
   const API_BASE = "https://noderouter.ldop.com";
 
+  function sseCode(model, prompt) {
+    return '// NodeRouter \u2014 '+model+' (SSE)\n'+
+      'const ENDPOINT = "'+API_BASE+'/v1/completions";\n'+
+      '\n'+
+      'const body = JSON.stringify({\n'+
+      '  model: "noderouter/'+model+'",\n'+
+      '  messages: [\n'+
+      '    { role: "system", content: "" },\n'+
+      '    { role: "user", content: "'+prompt+'" }\n'+
+      '  ]\n'+
+      '});\n'+
+      '\n'+
+      'fetch(ENDPOINT, {\n'+
+      '  method: "POST",\n'+
+      '  headers: { "Content-Type": "application/json" },\n'+
+      '  body: body\n'+
+      '}).then(async (response) => {\n'+
+      '\n'+
+      '  const reader = response.body.getReader();\n'+
+      '  const decoder = new TextDecoder();\n'+
+      '  let buffer = "";\n'+
+      '  let fullText = "";\n'+
+      '\n'+
+      '  while (true) {\n'+
+      '    const { done, value } = await reader.read();\n'+
+      '    if (done) break;\n'+
+      '\n'+
+      '    buffer += decoder.decode(value, { stream: true });\n'+
+      '    const lines = buffer.split("\\n");\n'+
+      '    buffer = lines.pop();\n'+
+      '\n'+
+      '    for (const line of lines) {\n'+
+      '      if (!line.startsWith("data: ")) continue;\n'+
+      '      const json = line.slice(6);\n'+
+      '      if (json === "[DONE]") { console.log(fullText); return; }\n'+
+      '      try {\n'+
+      '        const chunk = JSON.parse(json).content || "";\n'+
+      '        fullText += chunk;\n'+
+      '        process.stdout.write(chunk);\n'+
+      '      } catch (e) {}\n'+
+      '    }\n'+
+      '  }\n'+
+      '\n'+
+      '});\n';
+  }
+
   var MODELS = [
     {id:"deepseek-reasoner",slug:"noderouter/deepseek-reasoner",name:"DeepSeek Reasoner",desc:"Model penalaran deep reasoning unggul untuk coding, matematika, dan problem-solving kompleks dengan akurasi tinggi.",color:"#4F46E5",ctx:"128K",endpoint:"/v1/completions",latency:"~820ms",tags:["Penalaran","Coding","Matematika"],file:"deepseek-reasoner.fetch.js",
-     code:'// NodeRouter \u2014 DeepSeek Reasoner (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/deepseek-reasoner",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Jelaskan quicksort langkah demi langkah." }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
+     code: sseCode("deepseek-reasoner", "Jelaskan quicksort langkah demi langkah.")},
     {id:"grok-4-fast-reasoning",slug:"noderouter/grok-4-fast-reasoning",name:"Grok 4 Fast Reasoning",desc:"Model reasoning cepat dari xAI, unggul untuk problem-solving dan analisis real-time.",color:"#1DA1F2",ctx:"128K",endpoint:"/v1/completions",latency:"~650ms",tags:["Reasoning","Cepat","Real-time"],file:"grok-4-fast-reasoning.fetch.js",
-     code:'// NodeRouter \u2014 Grok 4 Fast Reasoning (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/grok-4-fast-reasoning",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Apa solusi terbaik untuk kemacetan Jakarta?" }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
+     code: sseCode("grok-4-fast-reasoning", "Apa solusi terbaik untuk kemacetan Jakarta?")},
     {id:"gpt-5.5",slug:"noderouter/gpt-5.5",name:"GPT-5.5",desc:"Model general-purpose terbaru dengan performa tinggi untuk berbagai tugas: chat, ringkasan, terjemahan, dan brainstorming.",color:"#10A37F",ctx:"256K",endpoint:"/v1/completions",latency:"~490ms",tags:["General","Cepat","Multi-task"],file:"gpt-5.5.fetch.js",
-     code:'// NodeRouter \u2014 GPT-5.5 (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/gpt-5.5",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Beri 5 ide startup AI 2026." }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
+     code: sseCode("gpt-5.5", "Beri 5 ide startup AI 2026.")},
     {id:"qwen-3.6-plus",slug:"noderouter/qwen-3.6-plus",name:"Qwen 3.6 Plus",desc:"Model multibahasa andal untuk percakapan, ringkasan dokumen, dan pemahaman teks dalam berbagai bahasa termasuk Indonesia.",color:"#6366F1",ctx:"128K",endpoint:"/v1/completions",latency:"~430ms",tags:["Multibahasa","Ringkasan","Chat"],file:"qwen-3.6-plus.fetch.js",
-     code:'// NodeRouter \u2014 Qwen 3.6 Plus (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/qwen-3.6-plus",\n    messages: [\n      { role: "system", content: "" },\n      { role: "user", content: "Jelaskan budaya gotong royong di Indonesia." }\n    ]\n  })\n}).then(async (r) => {\n  const reader = r.body.getReader();\n  const decoder = new TextDecoder();\n  let buf = "", full = "";\n  while (true) {\n    const { done, value } = await reader.read();\n    if (done) break;\n    buf += decoder.decode(value, { stream: true });\n    const lines = buf.split("\\n");\n    buf = lines.pop();\n    for (const line of lines) {\n      if (!line.startsWith("data: ")) continue;\n      const d = line.slice(6);\n      if (d === "[DONE]") { console.log(full); return; }\n      try {\n        const t = JSON.parse(d).content;\n        full += t;\n        process.stdout.write(t);\n      } catch (e) {}\n    }\n  }\n});\n'},
+     code: sseCode("qwen-3.6-plus", "Jelaskan budaya gotong royong di Indonesia.")},
     {id:"flux-schnell",slug:"noderouter/flux-schnell",name:"Flux Schnell",desc:"Model image generation cepat untuk kreasi visual, desain, dan seni digital.",color:"#EC4899",ctx:"N/A",endpoint:"/v1/images",latency:"~1.2s",tags:["Image Gen","Kreatif","Desain"],file:"flux-schnell.fetch.js",
-     code:'// NodeRouter \u2014 Flux Schnell\nconst E = "'+API_BASE+'/v1/images";\n\nfetch(E, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({\n    model: "noderouter/flux-schnell",\n    prompt: "A futuristic city at sunset"\n  })\n}).then(r => r.json()).then(d => console.log("Image:", d.image_url));\n'}
+     code: '// NodeRouter \u2014 Flux Schnell\n'+
+       'const ENDPOINT = "'+API_BASE+'/v1/images";\n'+
+       '\n'+
+       'const body = JSON.stringify({\n'+
+       '  model: "noderouter/flux-schnell",\n'+
+       '  prompt: "A futuristic city at sunset"\n'+
+       '});\n'+
+       '\n'+
+       'fetch(ENDPOINT, {\n'+
+       '  method: "POST",\n'+
+       '  headers: { "Content-Type": "application/json" },\n'+
+       '  body: body\n'+
+       '})\n'+
+       '  .then(r => r.json())\n'+
+       '  .then(d => console.log("Image:", d.image_url));\n'}
   ];
 
   var state = { modelIndex:2 };
@@ -466,8 +523,6 @@ data: [DONE]</pre>
     document.getElementById('modelNameMain').textContent = m.name;
     document.getElementById('modelProvMain').textContent = m.slug;
     document.getElementById('activeModelTitle').textContent = m.name;
-
-    // Desktop sidebar
     document.getElementById('sideDesc').textContent = m.desc;
     document.getElementById('specCtx').textContent = m.ctx;
     document.getElementById('specEndpoint').textContent = m.endpoint;
@@ -475,7 +530,6 @@ data: [DONE]</pre>
     var tagWrap = document.getElementById('sideTags'); tagWrap.innerHTML = '';
     m.tags.forEach(function(t){ var el = document.createElement('span'); el.className = 'v-tag'; el.textContent = t; tagWrap.appendChild(el); });
 
-    // Mobile info
     document.getElementById('miName').textContent = m.name;
     document.getElementById('miDesc').textContent = m.desc;
     document.getElementById('miCtx').textContent = 'Konteks: ' + m.ctx;
