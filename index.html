@@ -5,501 +5,299 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>NodeRouter — The Unified Interface For AI Models</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
-  :root{
-    --ink:#0A0A0A;
-    --ink-soft:#3A3A3A;
-    --muted:#6E6E6E;
-    --faint:#A3A3A1;
-    --bg:#FFFFFF;
-    --hair:#E7E7E5;
-    --hair-strong:#D9D9D6;
-    --accent:#3F3FF0;
-    --accent-soft:#EEEEFD;
-    --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    --sans:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
-  ::selection{ background:var(--accent-soft); color:var(--ink); }
-  *:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
-  button{ font-family:inherit; cursor:pointer; }
-
-  #app{ position:relative; width:100%; height:100vh; height:100dvh; overflow:hidden; background:var(--bg); }
-  .screen{ position:absolute; inset:0; display:flex; flex-direction:column; background:var(--bg); }
-  .screen.hidden{ visibility:hidden; pointer-events:none; }
-
-  #welcome{
-    align-items:center; justify-content:flex-start;
-    overflow-y:auto;
-    transition: opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
-  }
-  #welcome.leaving{ opacity:0; transform:scale(.98); pointer-events:none; }
-
-  .w-nav{
-    width:100%; flex:0 0 auto;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:18px 28px; border-bottom:1px solid var(--hair);
-  }
-  .w-brand{ display:flex; align-items:center; gap:9px; font-weight:800; font-size:16px; letter-spacing:-0.02em; }
-  .w-brand .mark{ width:24px; height:24px; border-radius:6px; display:block; }
-  .w-brand .accent{ color:var(--accent); }
-  .w-nav-links{ display:flex; align-items:center; gap:26px; font-size:13px; color:var(--ink-soft); font-weight:500; }
-  .w-nav-links a{ color:inherit; text-decoration:none; cursor:pointer; }
-  .w-nav-links a:hover{ color:var(--ink); }
-
-  .w-hero{
-    width:100%; max-width:760px; margin:0 auto;
-    display:flex; flex-direction:column; align-items:center; text-align:center;
-    padding:72px 24px 48px;
-  }
-  .w-eyebrow{
-    display:inline-flex; align-items:center; gap:7px;
-    font-family:var(--mono); font-size:11px; letter-spacing:.05em; text-transform:uppercase;
-    color:var(--ink-soft); border:1px solid var(--hair-strong); padding:5px 12px 5px 8px; border-radius:99px;
-    margin-bottom:26px;
-  }
-  .w-eyebrow .led{ width:6px; height:6px; border-radius:50%; background:#16A34A; }
-
-  .w-hero h1{
-    font-size:50px; font-weight:800; line-height:1.07; letter-spacing:-0.035em; margin:0;
-    color:var(--ink);
-  }
-  .w-hero h1 .accent{ color:var(--accent); }
-  .w-hero p.sub{
-    font-size:17px; color:var(--muted); margin:22px 0 0; line-height:1.6; max-width:520px;
-  }
-  .w-hero p.sub b{ color:var(--ink-soft); font-weight:600; }
-
-  .w-cta-row{ display:flex; align-items:center; gap:12px; margin-top:36px; flex-wrap:wrap; justify-content:center; }
-  .btn-primary{
-    border:1px solid var(--ink); background:var(--ink); color:#fff;
-    font-size:14px; font-weight:700; padding:13px 26px; border-radius:11px;
-    display:flex; align-items:center; gap:8px; letter-spacing:.01em;
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(10,10,10,.18); }
-  .btn-primary svg{ width:15px; height:15px; }
-  .btn-secondary{
-    border:1px solid var(--hair-strong); background:var(--bg); color:var(--ink);
-    font-size:14px; font-weight:700; padding:13px 24px; border-radius:11px;
-    display:flex; align-items:center; gap:8px;
-  }
-  .btn-secondary:hover{ border-color:var(--ink); }
-
-  .w-stats{
-    width:100%; max-width:680px; margin:56px auto 0;
-    display:grid; grid-template-columns:repeat(4, 1fr);
-    border-top:1px solid var(--hair);
-  }
-  .w-stat{ padding:24px 12px; text-align:center; border-right:1px solid var(--hair); }
-  .w-stat:last-child{ border-right:none; }
-  .w-stat .num{ font-size:25px; font-weight:800; letter-spacing:-0.02em; color:var(--ink); }
-  .w-stat .num.accent{ color:var(--accent); }
-  .w-stat .lbl{ font-size:11.5px; color:var(--faint); margin-top:4px; font-weight:500; }
-
-  .w-foot-strip{
-    width:100%; flex:0 0 auto; padding:18px 28px 26px; text-align:center;
-    font-size:11.5px; color:var(--faint); font-family:var(--mono);
-  }
-
-  #loading{ align-items:center; justify-content:center; }
-  #loading.hidden{ visibility:hidden; }
-  #loading{
-    transition: opacity .5s cubic-bezier(.4,0,.2,1), visibility 0s linear .5s;
-  }
-  #loading.leaving{ opacity:0; pointer-events:none; visibility:hidden; }
-
-  .l-bg-grid{
-    position:absolute; inset:0;
-    background-image:
-      linear-gradient(to right, #F2F2F1 1px, transparent 1px),
-      linear-gradient(to bottom, #F2F2F1 1px, transparent 1px);
-    background-size:56px 56px;
-    mask-image: radial-gradient(circle at 50% 42%, black 0%, transparent 68%);
-    -webkit-mask-image: radial-gradient(circle at 50% 42%, black 0%, transparent 68%);
-  }
-
-  .l-inner{ position:relative; display:flex; flex-direction:column; align-items:center; gap:30px; padding:32px; width:100%; max-width:380px; }
-
-  .l-mark{ width:60px; height:60px; position:relative; }
-  .l-mark img{ width:100%; height:100%; display:block; border-radius:14px; animation: markbreathe 1.8s ease infinite; }
-  @keyframes markbreathe{ 0%,100%{ transform:scale(1); opacity:.85; } 50%{ transform:scale(1.06); opacity:1; } }
-  @keyframes pulse{ 0%,100%{transform:scale(1);opacity:.35;} 50%{transform:scale(1.18);opacity:1;} }
-
-  .l-wordmark{ font-weight:800; font-size:22px; letter-spacing:-0.03em; }
-  .l-wordmark .accent{ color:var(--accent); }
-
-  .l-progress-wrap{ width:100%; display:flex; flex-direction:column; gap:10px; }
-  .l-progress-track{ width:100%; height:3px; background:var(--hair); border-radius:3px; overflow:hidden; }
-  .l-progress-fill{ height:100%; width:0%; background:var(--ink); border-radius:3px; transition: width .35s linear; }
-  .l-progress-meta{ display:flex; align-items:center; justify-content:space-between; font-family:var(--mono); font-size:11px; color:var(--faint); }
-  .l-progress-meta #loadPct{ color:var(--ink-soft); font-weight:600; }
-
-  .l-steps{ width:100%; display:flex; flex-direction:column; gap:9px; margin-top:2px; }
-  .l-step{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--faint); transition: color .25s ease; }
-  .l-step .step-icon{
-    width:16px; height:16px; border-radius:50%; border:1.5px solid var(--hair-strong);
-    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
-    transition: border-color .25s ease, background .25s ease;
-  }
-  .l-step .step-icon svg{ width:9px; height:9px; opacity:0; transition:opacity .2s ease; color:#fff; }
-  .l-step.active{ color:var(--ink); font-weight:600; }
-  .l-step.active .step-icon{ border-color:var(--ink); }
-  .l-step.done{ color:var(--ink-soft); }
-  .l-step.done .step-icon{ border-color:var(--ink); background:var(--ink); }
-  .l-step.done .step-icon svg{ opacity:1; }
-  .l-step.active .step-icon::after{
-    content:''; width:6px; height:6px; border-radius:50%; background:var(--ink);
-    animation:pulse 1s ease infinite;
-  }
-
-  #viewer{ }
-  .v-topbar{
-    height:58px; flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
-    padding:0 20px; border-bottom:1px solid var(--hair);
-  }
-  .v-brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:16.5px; letter-spacing:-0.02em; user-select:none; }
-  .v-brand .mark-img{ width:26px; height:26px; border-radius:7px; flex:0 0 auto; display:block; }
-  .v-brand .accent{ color:var(--accent); }
-  .v-brand-tag{
-    font-family:var(--mono); font-size:10px; color:var(--muted); background:var(--accent-soft);
-    border:1px solid #E1E1FB; padding:2px 7px; border-radius:99px; margin-left:2px;
-  }
-  .v-topbar-right{ display:flex; align-items:center; gap:12px; }
-  .v-credit{
-    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); border:1px solid var(--hair-strong);
-    padding:5px 10px; border-radius:8px; display:flex; align-items:center; gap:6px;
-  }
-  .v-credit .led{ width:6px; height:6px; border-radius:50%; background:#16A34A; }
-  .v-avatar{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex:0 0 auto; }
-
-  .v-subbar{
-    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px;
-    padding:12px 20px; border-bottom:1px solid var(--hair); background:#FCFCFB; flex-wrap:wrap;
-  }
-  .v-subbar-left{ display:flex; flex-direction:column; gap:2px; }
-  .v-subbar-left .lbl{ font-size:11px; color:var(--faint); font-family:var(--mono); letter-spacing:.03em; text-transform:uppercase; }
-  .v-subbar-left .ttl{ font-size:14px; font-weight:700; color:var(--ink); }
-
-  .model-select-wrap{ position:relative; }
-  .model-select{
-    display:flex; align-items:center; gap:10px; border:1px solid var(--hair-strong); background:var(--bg);
-    padding:8px 11px 8px 10px; border-radius:10px; font-size:13px; color:var(--ink); font-weight:600; min-width:222px;
-  }
-  .model-select:hover{ border-color:var(--ink); }
-  .model-dot{ width:7px; height:7px; border-radius:50%; flex:0 0 auto; }
-  .model-select .meta{ display:flex; flex-direction:column; align-items:flex-start; line-height:1.25; flex:1; min-width:0; }
-  .model-select .meta .mname{ font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
-  .model-select .meta .mprov{ font-size:10px; color:var(--faint); font-weight:500; font-family:var(--mono); }
-  .model-select .chev{ width:14px; height:14px; color:var(--muted); flex:0 0 auto; transition:transform .15s ease; }
-  .model-select-wrap.open .chev{ transform:rotate(180deg); }
-
-  .model-dropdown{
-    position:absolute; top:calc(100% + 7px); right:0; width:300px; background:var(--bg);
-    border:1px solid var(--hair-strong); border-radius:12px; box-shadow:0 14px 36px rgba(10,10,10,.1), 0 2px 8px rgba(10,10,10,.05);
-    padding:6px; z-index:40; opacity:0; transform:translateY(-4px) scale(.98); pointer-events:none;
-    transition: opacity .14s ease, transform .14s ease;
-  }
-  .model-select-wrap.open .model-dropdown{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-  .model-dropdown-label{ font-size:10px; font-weight:700; color:var(--faint); text-transform:uppercase; letter-spacing:.06em; padding:8px 10px 4px; }
-  .model-dropdown-list{ max-height:168px; overflow-y:auto; }
-  .model-option{ display:flex; align-items:center; gap:10px; padding:10px; border-radius:9px; border:none; background:none; width:100%; text-align:left; }
-  .model-option:hover{ background:#F5F5F4; }
-  .model-option.selected{ background:var(--accent-soft); }
-  .model-option .meta{ flex:1; min-width:0; }
-  .model-option .mname{ font-size:13px; font-weight:700; color:var(--ink); }
-  .model-option .mdesc{ font-size:11px; color:var(--muted); margin-top:1px; }
-  .model-option .check{ width:14px; height:14px; color:var(--accent); flex:0 0 auto; opacity:0; }
-  .model-option.selected .check{ opacity:1; }
-
-  .v-main{ flex:1 1 auto; display:flex; min-height:0; }
-  .v-code-col{ flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
-
-  .fetch-pill{
-    font-family:var(--mono); font-size:10px; color:#E4E4E7; background:#1C1C1F; border:1px solid #2A2A2D;
-    padding:2px 8px; border-radius:5px; font-weight:600; letter-spacing:.02em;
-  }
-
-  .v-code-toolbar{
-    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
-    padding:11px 20px; background:#0A0A0B; border-bottom:1px solid #1E1E20;
-  }
-  .v-code-toolbar .label{ font-family:var(--mono); font-size:11px; color:#8A8A8E; letter-spacing:.04em; text-transform:uppercase; display:flex; align-items:center; gap:8px; }
-  .lang-pill{ font-family:var(--mono); font-size:10px; color:#0A0A0A; background:#F2C744; padding:2px 7px; border-radius:5px; font-weight:700; }
-  .copy-code-btn{ border:1px solid #2A2A2D; background:transparent; color:#B8B8BC; font-size:11.5px; padding:6px 11px; border-radius:8px; display:flex; align-items:center; gap:6px; }
-  .copy-code-btn:hover{ border-color:#444; color:#fff; }
-  .copy-code-btn svg{ width:12px; height:12px; }
-
-  .v-code-scroll{ flex:1; overflow:auto; background:#0A0A0B; padding:22px 24px 40px 0; }
-  .v-code-scroll pre{ margin:0; font-family:var(--mono); font-size:12.8px; line-height:1.7; color:#E4E4E7; white-space:pre; tab-size:2; }
-  .v-code-table{ display:table; width:100%; border-collapse:collapse; }
-  .v-code-row{ display:table-row; }
-  .v-code-row .ln{
-    display:table-cell; user-select:none; -webkit-user-select:none;
-    text-align:right; padding:0 16px 0 0; color:#4A4A4F;
-    font-family:var(--mono); font-size:12.8px; line-height:1.7;
-    width:1%; white-space:nowrap; vertical-align:top;
-    position:sticky; left:0; background:#0A0A0B;
-  }
-  .v-code-row .ln-pad-left{ display:table-cell; width:24px; }
-  .v-code-row .code-line{
-    display:table-cell; font-family:var(--mono); font-size:12.8px; line-height:1.7;
-    color:#E4E4E7; white-space:pre; vertical-align:top; padding-right:24px;
-  }
-  .tok-kw{ color:#C792EA; }
-  .tok-str{ color:#9CDA84; }
-  .tok-fn{ color:#82AAFF; }
-  .tok-com{ color:#5C6370; font-style:italic; }
-  .tok-num{ color:#F78C6C; }
-  .tok-prop{ color:#7DD3FC; }
-  .tok-class{ color:#FFCB6B; }
-
-  .v-sidebar{
-    width:300px; flex:0 0 auto; border-left:1px solid var(--hair); padding:22px 20px; overflow-y:auto;
-    display:flex; flex-direction:column; gap:22px;
-  }
-  .v-side-block .h{ font-size:11px; font-weight:700; color:var(--faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
-  .v-spec-row{ display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F1F1EF; font-size:12.5px; }
-  .v-spec-row:last-child{ border-bottom:none; }
-  .v-spec-row .k{ color:var(--muted); }
-  .v-spec-row .v{ color:var(--ink); font-weight:600; font-family:var(--mono); font-size:12px; }
-  .v-desc-text{ font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
-  .v-tag-row{ display:flex; gap:6px; flex-wrap:wrap; }
-  .v-tag{ font-size:10.5px; font-weight:600; color:var(--ink-soft); background:#F4F4F3; border:1px solid var(--hair); padding:4px 9px; border-radius:99px; }
-
-  .overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:90;
-    opacity:0; pointer-events:none; transition:opacity .3s ease;
-  }
-  .overlay.active{ opacity:1; pointer-events:auto; }
-
-  .panel{
-    position:fixed; top:0; right:0; bottom:0; width:480px; max-width:92vw; background:#fff;
-    z-index:100; transform:translateX(100%); transition:transform .35s cubic-bezier(.4,0,.2,1);
-    display:flex; flex-direction:column; box-shadow:-10px 0 40px rgba(0,0,0,.12);
-  }
-  .panel.active{ transform:translateX(0); }
-  .panel-header{
-    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
-    padding:18px 24px; border-bottom:1px solid var(--hair);
-  }
-  .panel-header h3{ margin:0; font-size:18px; font-weight:800; letter-spacing:-.02em; }
-  .panel-close{
-    border:1px solid var(--hair-strong); background:var(--bg); width:34px; height:34px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--ink); line-height:1;
-  }
-  .panel-close:hover{ background:#f4f4f4; }
-  .panel-body{ flex:1; overflow-y:auto; padding:24px; }
-  .panel-body p,.panel-body li{ font-size:14px; color:var(--ink-soft); line-height:1.7; }
-  .panel-body h4{ font-size:15px; font-weight:700; margin:20px 0 8px; color:var(--ink); }
-  .panel-body code{ font-family:var(--mono); font-size:12px; background:#f4f4f4; padding:2px 6px; border-radius:4px; }
-  .panel-body pre{ font-family:var(--mono); font-size:12px; background:#f8f8f8; padding:14px; border-radius:8px; overflow-x:auto; white-space:pre-wrap; line-height:1.6; margin:10px 0; }
-  .model-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .model-card{ border:1px solid var(--hair); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:8px; }
-  .model-card .mc-top{ display:flex; align-items:center; gap:10px; }
-  .model-card .mc-dot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
-  .model-card .mc-name{ font-weight:700; font-size:14px; }
-  .model-card .mc-slug{ font-family:var(--mono); font-size:10px; color:var(--faint); }
-  .model-card .mc-desc{ font-size:11.5px; color:var(--muted); line-height:1.5; }
-  .model-card .mc-tags{ display:flex; gap:4px; flex-wrap:wrap; }
-  .model-card .mc-tag{ font-size:10px; background:#f4f4f3; padding:2px 7px; border-radius:99px; color:var(--ink-soft); }
-
-  @media (max-width: 880px){
-    .v-sidebar{ display:none; }
-    .panel{ width:100%; max-width:100%; }
-    .model-grid{ grid-template-columns:1fr; }
-  }
-  @media (max-width: 680px){
-    #app{ overflow:auto; }
-    .screen{ position:relative; min-height:100vh; min-height:100dvh; }
-    .screen.hidden{ display:none; }
-    #welcome{ overflow:visible; }
-    .w-nav{ padding:12px 14px; }
-    .w-nav-links{ gap:14px; font-size:11px; }
-    .w-brand{ font-size:14px; }
-    .w-brand .mark{ width:20px; height:20px; }
-    .w-hero{ padding:36px 14px 28px; }
-    .w-hero h1{ font-size:26px; }
-    .w-hero p.sub{ font-size:13px; margin:14px 0 0; }
-    .w-stats{ grid-template-columns:repeat(2,1fr); margin-top:28px; }
-    .w-stat{ padding:14px 6px; border-bottom:1px solid var(--hair); }
-    .w-stat .num{ font-size:20px; }
-    .w-stat .lbl{ font-size:10px; }
-    .btn-primary,.btn-secondary{ font-size:12px; padding:10px 16px; }
-    .w-foot-strip{ font-size:10px; padding:12px 14px 18px; }
-    .v-topbar{ padding:0 12px; height:48px; }
-    .v-brand{ font-size:13px; gap:6px; }
-    .v-brand .mark-img{ width:20px; height:20px; }
-    .v-brand-tag{ display:none; }
-    .v-credit{ display:none; }
-    .v-avatar{ width:24px; height:24px; font-size:10px; }
-    .v-subbar{ padding:8px 12px; gap:8px; }
-    .model-select{ min-width:0; padding:6px 8px; font-size:11px; }
-    .model-select .meta .mname{ max-width:80px; font-size:11px; }
-    .model-dropdown{ width:240px; right:-8px; }
-    .v-code-scroll{ padding:12px 10px 24px 0; }
-    .v-code-toolbar{ padding:8px 12px; }
-    .v-code-toolbar .label{ font-size:9px; gap:4px; }
-    .lang-pill{ font-size:8px; padding:1px 5px; }
-    .copy-code-btn{ font-size:10px; padding:4px 8px; }
-    .v-code-scroll pre{ font-size:10px; }
-    .v-code-row .ln{ font-size:10px; padding:0 8px 0 0; }
-    .v-code-row .code-line{ font-size:10px; }
-    .v-code-row .ln-pad-left{ width:12px; }
-    .l-inner{ padding:20px; gap:20px; }
-    .l-mark{ width:44px; height:44px; }
-    .l-wordmark{ font-size:18px; }
-    .l-step{ font-size:11px; }
-  }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+:root{--ink:#0A0A0A;--ink-soft:#3A3A3A;--muted:#6E6E6E;--faint:#A3A3A1;--bg:#FFFFFF;--hair:#E7E7E5;--hair-strong:#D9D9D6;--accent:#3F3FF0;--accent-soft:#EEEEFD;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
+::selection{background:var(--accent-soft);color:var(--ink);}
+*:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+button{font-family:inherit;cursor:pointer;}
+#app{position:relative;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);}
+.screen.hidden{visibility:hidden;pointer-events:none;}
+#welcome{align-items:center;justify-content:flex-start;overflow-y:auto;transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);}
+#welcome.leaving{opacity:0;transform:scale(.98);pointer-events:none;}
+.w-nav{width:100%;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--hair);}
+.w-brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;letter-spacing:-0.02em;}
+.w-brand .mark{width:24px;height:24px;border-radius:6px;display:block;}
+.w-brand .accent{color:var(--accent);}
+.w-nav-links{display:flex;align-items:center;gap:26px;font-size:13px;color:var(--ink-soft);font-weight:500;}
+.w-nav-links a{color:inherit;text-decoration:none;cursor:pointer;}
+.w-nav-links a:hover{color:var(--ink);}
+.w-hero{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;padding:72px 24px 48px;}
+.w-eyebrow{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--hair-strong);padding:5px 12px 5px 8px;border-radius:99px;margin-bottom:26px;}
+.w-eyebrow .led{width:6px;height:6px;border-radius:50%;background:#16A34A;}
+.w-hero h1{font-size:50px;font-weight:800;line-height:1.07;letter-spacing:-0.035em;margin:0;color:var(--ink);}
+.w-hero h1 .accent{color:var(--accent);}
+.w-hero p.sub{font-size:17px;color:var(--muted);margin:22px 0 0;line-height:1.6;max-width:520px;}
+.w-hero p.sub b{color:var(--ink-soft);font-weight:600;}
+.w-cta-row{display:flex;align-items:center;gap:12px;margin-top:36px;flex-wrap:wrap;justify-content:center;}
+.btn-primary{border:1px solid var(--ink);background:var(--ink);color:#fff;font-size:14px;font-weight:700;padding:13px 26px;border-radius:11px;display:flex;align-items:center;gap:8px;letter-spacing:.01em;transition:transform .15s ease,box-shadow .15s ease;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(10,10,10,.18);}
+.btn-primary svg{width:15px;height:15px;}
+.btn-secondary{border:1px solid var(--hair-strong);background:var(--bg);color:var(--ink);font-size:14px;font-weight:700;padding:13px 24px;border-radius:11px;display:flex;align-items:center;gap:8px;}
+.btn-secondary:hover{border-color:var(--ink);}
+.w-stats{width:100%;max-width:680px;margin:56px auto 0;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--hair);}
+.w-stat{padding:24px 12px;text-align:center;border-right:1px solid var(--hair);}
+.w-stat:last-child{border-right:none;}
+.w-stat .num{font-size:25px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);}
+.w-stat .num.accent{color:var(--accent);}
+.w-stat .lbl{font-size:11.5px;color:var(--faint);margin-top:4px;font-weight:500;}
+.w-foot-strip{width:100%;flex:0 0 auto;padding:18px 28px 26px;text-align:center;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+#loading{align-items:center;justify-content:center;}
+#loading.hidden{visibility:hidden;}
+#loading{transition:opacity .5s cubic-bezier(.4,0,.2,1),visibility 0s linear .5s;}
+#loading.leaving{opacity:0;pointer-events:none;visibility:hidden;}
+.l-bg-grid{position:absolute;inset:0;background-image:linear-gradient(to right,#F2F2F1 1px,transparent 1px),linear-gradient(to bottom,#F2F2F1 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(circle at 50% 42%,black 0%,transparent 68%);-webkit-mask-image:radial-gradient(circle at 50% 42%,black 0%,transparent 68%);}
+.l-inner{position:relative;display:flex;flex-direction:column;align-items:center;gap:30px;padding:32px;width:100%;max-width:380px;}
+.l-mark{width:60px;height:60px;position:relative;}
+.l-mark img{width:100%;height:100%;display:block;border-radius:14px;animation:markbreathe 1.8s ease infinite;}
+@keyframes markbreathe{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.06);opacity:1;}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.35;}50%{transform:scale(1.18);opacity:1;}}
+.l-wordmark{font-weight:800;font-size:22px;letter-spacing:-0.03em;}
+.l-wordmark .accent{color:var(--accent);}
+.l-progress-wrap{width:100%;display:flex;flex-direction:column;gap:10px;}
+.l-progress-track{width:100%;height:3px;background:var(--hair);border-radius:3px;overflow:hidden;}
+.l-progress-fill{height:100%;width:0%;background:var(--ink);border-radius:3px;transition:width .35s linear;}
+.l-progress-meta{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--faint);}
+.l-progress-meta #loadPct{color:var(--ink-soft);font-weight:600;}
+.l-steps{width:100%;display:flex;flex-direction:column;gap:9px;margin-top:2px;}
+.l-step{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--faint);transition:color .25s ease;}
+.l-step .step-icon{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--hair-strong);display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:border-color .25s ease,background .25s ease;}
+.l-step .step-icon svg{width:9px;height:9px;opacity:0;transition:opacity .2s ease;color:#fff;}
+.l-step.active{color:var(--ink);font-weight:600;}
+.l-step.active .step-icon{border-color:var(--ink);}
+.l-step.done{color:var(--ink-soft);}
+.l-step.done .step-icon{border-color:var(--ink);background:var(--ink);}
+.l-step.done .step-icon svg{opacity:1;}
+.l-step.active .step-icon::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink);animation:pulse 1s ease infinite;}
+#viewer{}
+.v-topbar{height:58px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--hair);}
+.v-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16.5px;letter-spacing:-0.02em;user-select:none;}
+.v-brand .mark-img{width:26px;height:26px;border-radius:7px;flex:0 0 auto;display:block;}
+.v-brand .accent{color:var(--accent);}
+.v-brand-tag{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--accent-soft);border:1px solid #E1E1FB;padding:2px 7px;border-radius:99px;margin-left:2px;}
+.v-topbar-right{display:flex;align-items:center;gap:12px;}
+.v-credit{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);border:1px solid var(--hair-strong);padding:5px 10px;border-radius:8px;display:flex;align-items:center;gap:6px;}
+.v-credit .led{width:6px;height:6px;border-radius:50%;background:#16A34A;}
+.v-avatar{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 auto;}
+.v-subbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 20px;border-bottom:1px solid var(--hair);background:#FCFCFB;flex-wrap:wrap;}
+.v-subbar-left{display:flex;flex-direction:column;gap:2px;}
+.v-subbar-left .lbl{font-size:11px;color:var(--faint);font-family:var(--mono);letter-spacing:.03em;text-transform:uppercase;}
+.v-subbar-left .ttl{font-size:14px;font-weight:700;color:var(--ink);}
+.model-select-wrap{position:relative;}
+.model-select{display:flex;align-items:center;gap:10px;border:1px solid var(--hair-strong);background:var(--bg);padding:8px 11px 8px 10px;border-radius:10px;font-size:13px;color:var(--ink);font-weight:600;min-width:222px;}
+.model-select:hover{border-color:var(--ink);}
+.model-dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;}
+.model-select .meta{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;flex:1;min-width:0;}
+.model-select .meta .mname{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+.model-select .meta .mprov{font-size:10px;color:var(--faint);font-weight:500;font-family:var(--mono);}
+.model-select .chev{width:14px;height:14px;color:var(--muted);flex:0 0 auto;transition:transform .15s ease;}
+.model-select-wrap.open .chev{transform:rotate(180deg);}
+.model-dropdown{position:absolute;top:calc(100% + 7px);right:0;width:300px;background:var(--bg);border:1px solid var(--hair-strong);border-radius:12px;box-shadow:0 14px 36px rgba(10,10,10,.1),0 2px 8px rgba(10,10,10,.05);padding:6px;z-index:40;opacity:0;transform:translateY(-4px) scale(.98);pointer-events:none;transition:opacity .14s ease,transform .14s ease;}
+.model-select-wrap.open .model-dropdown{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+.model-dropdown-label{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px 4px;}
+.model-dropdown-list{max-height:168px;overflow-y:auto;}
+.model-option{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;border:none;background:none;width:100%;text-align:left;}
+.model-option:hover{background:#F5F5F4;}
+.model-option.selected{background:var(--accent-soft);}
+.model-option .meta{flex:1;min-width:0;}
+.model-option .mname{font-size:13px;font-weight:700;color:var(--ink);}
+.model-option .mdesc{font-size:11px;color:var(--muted);margin-top:1px;}
+.model-option .check{width:14px;height:14px;color:var(--accent);flex:0 0 auto;opacity:0;}
+.model-option.selected .check{opacity:1;}
+.v-main{flex:1 1 auto;display:flex;min-height:0;}
+.v-code-col{flex:1 1 auto;display:flex;flex-direction:column;min-width:0;}
+.fetch-pill{font-family:var(--mono);font-size:10px;color:#E4E4E7;background:#1C1C1F;border:1px solid #2A2A2D;padding:2px 8px;border-radius:5px;font-weight:600;letter-spacing:.02em;}
+.v-code-toolbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:11px 20px;background:#0A0A0B;border-bottom:1px solid #1E1E20;}
+.v-code-toolbar .label{font-family:var(--mono);font-size:11px;color:#8A8A8E;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.lang-pill{font-family:var(--mono);font-size:10px;color:#0A0A0A;background:#F2C744;padding:2px 7px;border-radius:5px;font-weight:700;}
+.copy-code-btn{border:1px solid #2A2A2D;background:transparent;color:#B8B8BC;font-size:11.5px;padding:6px 11px;border-radius:8px;display:flex;align-items:center;gap:6px;}
+.copy-code-btn:hover{border-color:#444;color:#fff;}
+.copy-code-btn svg{width:12px;height:12px;}
+.v-code-scroll{flex:1;overflow:auto;background:#0A0A0B;padding:22px 24px 40px 0;}
+.v-code-scroll pre{margin:0;font-family:var(--mono);font-size:12.8px;line-height:1.7;color:#E4E4E7;white-space:pre;tab-size:2;}
+.v-code-table{display:table;width:100%;border-collapse:collapse;}
+.v-code-row{display:table-row;}
+.v-code-row .ln{display:table-cell;user-select:none;-webkit-user-select:none;text-align:right;padding:0 16px 0 0;color:#4A4A4F;font-family:var(--mono);font-size:12.8px;line-height:1.7;width:1%;white-space:nowrap;vertical-align:top;position:sticky;left:0;background:#0A0A0B;}
+.v-code-row .ln-pad-left{display:table-cell;width:24px;}
+.v-code-row .code-line{display:table-cell;font-family:var(--mono);font-size:12.8px;line-height:1.7;color:#E4E4E7;white-space:pre;vertical-align:top;padding-right:24px;}
+.tok-kw{color:#C792EA;}
+.tok-str{color:#9CDA84;}
+.tok-fn{color:#82AAFF;}
+.tok-com{color:#5C6370;font-style:italic;}
+.tok-num{color:#F78C6C;}
+.tok-prop{color:#7DD3FC;}
+.tok-class{color:#FFCB6B;}
+.v-sidebar{width:300px;flex:0 0 auto;border-left:1px solid var(--hair);padding:22px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:22px;}
+.v-side-block .h{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.v-spec-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F1F1EF;font-size:12.5px;}
+.v-spec-row:last-child{border-bottom:none;}
+.v-spec-row .k{color:var(--muted);}
+.v-spec-row .v{color:var(--ink);font-weight:600;font-family:var(--mono);font-size:12px;}
+.v-desc-text{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+.v-tag-row{display:flex;gap:6px;flex-wrap:wrap;}
+.v-tag{font-size:10.5px;font-weight:600;color:var(--ink-soft);background:#F4F4F3;border:1px solid var(--hair);padding:4px 9px;border-radius:99px;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s ease;}
+.overlay.active{opacity:1;pointer-events:auto;}
+.panel{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:92vw;background:#fff;z-index:100;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.12);}
+.panel.active{transform:translateX(0);}
+.panel-header{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--hair);}
+.panel-header h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em;}
+.panel-close{border:1px solid var(--hair-strong);background:var(--bg);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink);line-height:1;}
+.panel-close:hover{background:#f4f4f4;}
+.panel-body{flex:1;overflow-y:auto;padding:24px;}
+.panel-body p,.panel-body li{font-size:14px;color:var(--ink-soft);line-height:1.7;}
+.panel-body h4{font-size:15px;font-weight:700;margin:20px 0 8px;color:var(--ink);}
+.panel-body code{font-family:var(--mono);font-size:12px;background:#f4f4f4;padding:2px 6px;border-radius:4px;}
+.panel-body pre{font-family:var(--mono);font-size:12px;background:#f8f8f8;padding:14px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;line-height:1.6;margin:10px 0;}
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.model-card{border:1px solid var(--hair);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.model-card .mc-top{display:flex;align-items:center;gap:10px;}
+.model-card .mc-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;}
+.model-card .mc-name{font-weight:700;font-size:14px;}
+.model-card .mc-slug{font-family:var(--mono);font-size:10px;color:var(--faint);}
+.model-card .mc-desc{font-size:11.5px;color:var(--muted);line-height:1.5;}
+.model-card .mc-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.model-card .mc-tag{font-size:10px;background:#f4f4f3;padding:2px 7px;border-radius:99px;color:var(--ink-soft);}
+@media (max-width:880px){.v-sidebar{display:none;}.panel{width:100%;max-width:100%;}.model-grid{grid-template-columns:1fr;}}
+@media (max-width:680px){#app{overflow:auto;}.screen{position:relative;min-height:100vh;min-height:100dvh;}.screen.hidden{display:none;}#welcome{overflow:visible;}.w-nav{padding:12px 14px;}.w-nav-links{gap:14px;font-size:11px;}.w-brand{font-size:14px;}.w-brand .mark{width:20px;height:20px;}.w-hero{padding:36px 14px 28px;}.w-hero h1{font-size:26px;}.w-hero p.sub{font-size:13px;margin:14px 0 0;}.w-stats{grid-template-columns:repeat(2,1fr);margin-top:28px;}.w-stat{padding:14px 6px;border-bottom:1px solid var(--hair);}.w-stat .num{font-size:20px;}.w-stat .lbl{font-size:10px;}.btn-primary,.btn-secondary{font-size:12px;padding:10px 16px;}.w-foot-strip{font-size:10px;padding:12px 14px 18px;}.v-topbar{padding:0 12px;height:48px;}.v-brand{font-size:13px;gap:6px;}.v-brand .mark-img{width:20px;height:20px;}.v-brand-tag{display:none;}.v-credit{display:none;}.v-avatar{width:24px;height:24px;font-size:10px;}.v-subbar{padding:8px 12px;gap:8px;}.model-select{min-width:0;padding:6px 8px;font-size:11px;}.model-select .meta .mname{max-width:80px;font-size:11px;}.model-dropdown{width:240px;right:-8px;}.v-code-scroll{padding:12px 10px 24px 0;}.v-code-toolbar{padding:8px 12px;}.v-code-toolbar .label{font-size:9px;gap:4px;}.lang-pill{font-size:8px;padding:1px 5px;}.copy-code-btn{font-size:10px;padding:4px 8px;}.v-code-scroll pre{font-size:10px;}.v-code-row .ln{font-size:10px;padding:0 8px 0 0;}.v-code-row .code-line{font-size:10px;}.v-code-row .ln-pad-left{width:12px;}.l-inner{padding:20px;gap:20px;}.l-mark{width:44px;height:44px;}.l-wordmark{font-size:18px;}.l-step{font-size:11px;}}
 </style>
 </head>
 <body>
-
 <div id="app">
+<div class="overlay" id="overlay"></div>
 
-  <div class="overlay" id="overlay"></div>
+<div class="panel" id="panelModels">
+<div class="panel-header"><h3>Models</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+<div class="panel-body"><p style="margin-top:0;">5 model AI + image generation tersedia melalui satu endpoint unified.</p><div class="model-grid" id="panelModelGrid"></div></div>
+</div>
 
-  <div class="panel" id="panelModels">
-    <div class="panel-header"><h3>Models</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
-    <div class="panel-body"><p style="margin-top:0;">6 model tersedia melalui satu endpoint unified.</p><div class="model-grid" id="panelModelGrid"></div></div>
-  </div>
-
-  <div class="panel" id="panelDocs">
-    <div class="panel-header"><h3>Dokumentasi</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
-    <div class="panel-body">
-      <h4>Chat Completions</h4>
-      <pre>POST /v1/completions
+<div class="panel" id="panelDocs">
+<div class="panel-header"><h3>Dokumentasi</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+<div class="panel-body">
+<h4>Base URL</h4><pre>https://noderouter.ldop.com</pre>
+<h4>Chat Completions (SSE Streaming)</h4>
+<pre>POST /v1/completions
 Content-Type: application/json
 
 {
   "model": "noderouter/gpt-5.5",
   "messages": [
-    { "role": "system", "content": "..." },
+    { "role": "system", "content": "" },
     { "role": "user", "content": "..." }
   ]
 }</pre>
-      <h4>Image Generation</h4>
-      <pre>POST /v1/images
+<h4>Image Generation</h4>
+<pre>POST /v1/images
 Content-Type: application/json
 
 {
   "model": "noderouter/flux-schnell",
   "prompt": "A beautiful sunset"
 }</pre>
-      <h4>Response</h4>
-      <pre>{"content": "..."}</pre>
-    </div>
-  </div>
+<h4>Response (SSE)</h4>
+<pre>data: {"content":"..."}
+data: [DONE]</pre>
+</div>
+</div>
 
-  <div class="panel" id="panelAbout">
-    <div class="panel-header"><h3>About Us</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
-    <div class="panel-body">
-      <p><strong>NodeRouter</strong> adalah unified API gateway untuk berbagai model AI dalam satu endpoint.</p>
-      <p>Satu endpoint, semua model.</p>
-      <h4>Statistik</h4>
-      <p>400K+ token/bulan. 20+ pengguna. 3+ penyedia. 6 model.</p>
-    </div>
-  </div>
+<div class="panel" id="panelAbout">
+<div class="panel-header"><h3>About Us</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+<div class="panel-body">
+<p><strong>NodeRouter</strong> adalah unified API gateway untuk berbagai model AI dalam satu endpoint.</p>
+<p>Satu endpoint, semua model. Streaming SSE.</p>
+<h4>Statistik</h4><p>400K+ token/bulan. 20+ pengguna. 3+ penyedia. 5 model.</p>
+</div>
+</div>
 
-  <div class="screen" id="welcome">
-    <nav class="w-nav">
-      <div class="w-brand">
-        <img class="mark" alt="NodeRouter" src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" style="height:35px;width:35px">
-        Node<span class="accent" style="transform:translate(-5px,0);color:#000">Router</span>
-      </div>
-      <div class="w-nav-links">
-        <a onclick="openPanel('models')">Model</a>
-        <a onclick="openPanel('docs')">Dokumentasi</a>
-        <a onclick="openPanel('about')">About Us</a>
-      </div>
-    </nav>
+<div class="screen" id="welcome">
+<nav class="w-nav">
+<div class="w-brand"><img class="mark" alt="NodeRouter" src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" style="height:35px;width:35px">Node<span class="accent" style="transform:translate(-5px,0);color:#000">Router</span></div>
+<div class="w-nav-links"><a onclick="openPanel('models')">Model</a><a onclick="openPanel('docs')">Dokumentasi</a><a onclick="openPanel('about')">About Us</a></div>
+</nav>
+<div class="w-hero">
+<span class="w-eyebrow"><span class="led"></span>400K token dirutekan bulan ini</span>
+<h1>The Unified Interface<br>For <span class="accent" style="color:#bdbdbd">AI Models</span></h1>
+<p class="sub">Unlimited, <b>Free</b>, akses ke Puluhan model dari puluhan penyedia. Bandingkan Kompetitor, ganti model tanpa Pusing tagihan</p>
+<div class="w-cta-row">
+<button class="btn-primary" id="startedBtn">Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+<button class="btn-secondary" id="communityBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Community</button>
+</div>
+<div class="w-stats">
+<div class="w-stat"><div class="num">400K</div><div class="lbl">Token / bulan</div></div>
+<div class="w-stat"><div class="num">20+</div><div class="lbl">Pengguna global</div></div>
+<div class="w-stat"><div class="num">3+</div><div class="lbl">Penyedia</div></div>
+<div class="w-stat"><div class="num accent" style="color:#000">5</div><div class="lbl">Model</div></div>
+</div>
+</div>
+<div class="w-foot-strip">NodeRouter &middot; satu API untuk semua model AI</div>
+</div>
 
-    <div class="w-hero">
-      <span class="w-eyebrow"><span class="led"></span>400K token dirutekan bulan ini</span>
-      <h1>The Unified Interface<br>For <span class="accent" style="color:#bdbdbd">AI Models</span></h1>
-      <p class="sub">Unlimited, <b>Free</b>, akses ke Puluhan model dari puluhan penyedia. Bandingkan Kompetitor, ganti model tanpa Pusing tagihan</p>
-      <div class="w-cta-row">
-        <button class="btn-primary" id="startedBtn">Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
-        <button class="btn-secondary" id="communityBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Community</button>
-      </div>
-      <div class="w-stats">
-        <div class="w-stat"><div class="num">400K</div><div class="lbl">Token / bulan</div></div>
-        <div class="w-stat"><div class="num">20+</div><div class="lbl">Pengguna global</div></div>
-        <div class="w-stat"><div class="num">3+</div><div class="lbl">Penyedia</div></div>
-        <div class="w-stat"><div class="num accent" style="color:#000">6</div><div class="lbl">Model</div></div>
-      </div>
-    </div>
-    <div class="w-foot-strip">NodeRouter &middot; satu API untuk semua model AI</div>
-  </div>
+<div class="screen hidden" id="loading">
+<div class="l-bg-grid"></div>
+<div class="l-inner">
+<div class="l-mark"><img src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" alt=""></div>
+<div class="l-wordmark">Node<span class="accent" style="color:#000">Router</span></div>
+<div class="l-progress-wrap"><div class="l-progress-track"><div class="l-progress-fill" id="loadFill"></div></div><div class="l-progress-meta"><span id="loadLabel">Menghubungkan ke endpoint</span><span id="loadPct">0%</span></div></div>
+<div class="l-steps" id="loadSteps">
+<div class="l-step" data-step="0"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Mengautentikasi sesi</div>
+<div class="l-step" data-step="1"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Menghubungkan ke endpoint router</div>
+<div class="l-step" data-step="2"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Memuat katalog model</div>
+<div class="l-step" data-step="3"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Menyusun contoh implementasi</div>
+</div>
+</div>
+</div>
 
-  <div class="screen hidden" id="loading">
-    <div class="l-bg-grid"></div>
-    <div class="l-inner">
-      <div class="l-mark"><img src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" alt=""></div>
-      <div class="l-wordmark">Node<span class="accent" style="color:#000">Router</span></div>
-      <div class="l-progress-wrap">
-        <div class="l-progress-track"><div class="l-progress-fill" id="loadFill"></div></div>
-        <div class="l-progress-meta"><span id="loadLabel">Menghubungkan ke endpoint</span><span id="loadPct">0%</span></div>
-      </div>
-      <div class="l-steps" id="loadSteps">
-        <div class="l-step" data-step="0"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Mengautentikasi sesi</div>
-        <div class="l-step" data-step="1"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Menghubungkan ke endpoint router</div>
-        <div class="l-step" data-step="2"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Memuat katalog model</div>
-        <div class="l-step" data-step="3"><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Menyusun contoh implementasi</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="screen hidden" id="viewer">
-    <header class="v-topbar">
-      <div class="v-brand"><img class="mark-img" src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" alt="">Node<span class="accent" style="color:#000">Router</span><span class="v-brand-tag">IMPLEMENTASI</span></div>
-      <div class="v-topbar-right"><div class="v-credit"><span class="led"></span>Online</div><div class="v-avatar">0x</div></div>
-    </header>
-    <div class="v-subbar">
-      <div class="v-subbar-left"><span class="lbl">Model aktif</span><span class="ttl" id="activeModelTitle">GPT-5.5</span></div>
-      <div class="model-select-wrap" id="modelSelectWrap">
-        <button class="model-select" id="modelSelectBtn"><span class="model-dot" id="modelDotMain" style="background:#10A37F"></span><span class="meta"><span class="mname" id="modelNameMain">GPT-5.5</span><span class="mprov" id="modelProvMain">noderouter/gpt-5.5</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
-        <div class="model-dropdown" id="modelDropdown"><div class="model-dropdown-label">6 model tersedia</div><div class="model-dropdown-list" id="modelDropdownList"></div></div>
-      </div>
-    </div>
-    <div class="v-main">
-      <div class="v-code-col">
-        <div class="v-code-toolbar"><span class="label"><span class="lang-pill">JS</span><span id="codeFileLabel">gpt-5.5.fetch.js</span></span><button class="copy-code-btn" id="copyCodeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Salin</button></div>
-        <div class="v-code-scroll"><pre id="codeBlock"></pre></div>
-      </div>
-      <aside class="v-sidebar">
-        <div class="v-side-block"><div class="h">Tentang model</div><div class="v-desc-text" id="sideDesc"></div></div>
-        <div class="v-side-block"><div class="h">Spesifikasi</div>
-          <div class="v-spec-row"><span class="k">Konteks</span><span class="v" id="specCtx"></span></div>
-          <div class="v-spec-row"><span class="k">Endpoint</span><span class="v" id="specEndpoint"></span></div>
-          <div class="v-spec-row"><span class="k">Latensi tipikal</span><span class="v" id="specLatency"></span></div>
-        </div>
-        <div class="v-side-block"><div class="h">Cocok untuk</div><div class="v-tag-row" id="sideTags"></div></div>
-      </aside>
-    </div>
-  </div>
-
+<div class="screen hidden" id="viewer">
+<header class="v-topbar">
+<div class="v-brand"><img class="mark-img" src="https://i.ibb.co/tT5yBbxS/Whats-App-Image-2026-06-21-at-11-55-15.jpg" alt="">Node<span class="accent" style="color:#000">Router</span><span class="v-brand-tag">IMPLEMENTASI</span></div>
+<div class="v-topbar-right"><div class="v-credit"><span class="led"></span>Online</div><div class="v-avatar">0x</div></div>
+</header>
+<div class="v-subbar">
+<div class="v-subbar-left"><span class="lbl">Model aktif</span><span class="ttl" id="activeModelTitle">GPT-5.5</span></div>
+<div class="model-select-wrap" id="modelSelectWrap">
+<button class="model-select" id="modelSelectBtn"><span class="model-dot" id="modelDotMain" style="background:#10A37F"></span><span class="meta"><span class="mname" id="modelNameMain">GPT-5.5</span><span class="mprov" id="modelProvMain">noderouter/gpt-5.5</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+<div class="model-dropdown" id="modelDropdown"><div class="model-dropdown-label">6 model tersedia</div><div class="model-dropdown-list" id="modelDropdownList"></div></div>
+</div>
+</div>
+<div class="v-main">
+<div class="v-code-col">
+<div class="v-code-toolbar"><span class="label"><span class="lang-pill">JS</span><span id="codeFileLabel">gpt-5.5.fetch.js</span></span><button class="copy-code-btn" id="copyCodeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Salin</button></div>
+<div class="v-code-scroll"><pre id="codeBlock"></pre></div>
+</div>
+<aside class="v-sidebar">
+<div class="v-side-block"><div class="h">Tentang model</div><div class="v-desc-text" id="sideDesc"></div></div>
+<div class="v-side-block"><div class="h">Spesifikasi</div>
+<div class="v-spec-row"><span class="k">Konteks</span><span class="v" id="specCtx"></span></div>
+<div class="v-spec-row"><span class="k">Endpoint</span><span class="v" id="specEndpoint"></span></div>
+<div class="v-spec-row"><span class="k">Latensi tipikal</span><span class="v" id="specLatency"></span></div>
+</div>
+<div class="v-side-block"><div class="h">Cocok untuk</div><div class="v-tag-row" id="sideTags"></div></div>
+</aside>
+</div>
+</div>
 </div>
 
 <script>
 (function(){
   "use strict";
 
+  const API_BASE = "https://noderouter.ldop.com";
+
   var MODELS = [
     {id:"deepseek-reasoner",slug:"noderouter/deepseek-reasoner",name:"DeepSeek Reasoner",desc:"Model penalaran deep reasoning unggul untuk coding, matematika, dan problem-solving kompleks dengan akurasi tinggi.",color:"#4F46E5",ctx:"128K",endpoint:"/v1/completions",latency:"~820ms",tags:["Penalaran","Coding","Matematika"],file:"deepseek-reasoner.fetch.js",
-     code:'// NodeRouter - DeepSeek Reasoner\nconst E = "https://fatahciken.vercel.app/v1/completions";\n\nasync function reason(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/deepseek-reasoner",\n      messages: [\n        { role: "system", content: "" },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nreason("Jelaskan quicksort langkah demi langkah.").then(console.log);\n'},
-    {id:"claude-sonnet-4.5",slug:"noderouter/claude-sonnet-4.5",name:"Claude Sonnet 4.5",desc:"Model seimbang untuk percakapan natural, analisis mendalam, dan konten kreatif dengan konteks 200K token.",color:"#D97706",ctx:"200K",endpoint:"/v1/completions",latency:"~580ms",tags:["Percakapan","Analisis","Kreatif"],file:"claude-sonnet-4.5.fetch.js",
-     code:'// NodeRouter - Claude Sonnet 4.5\nconst E = "https://fatahciken.vercel.app/v1/completions";\n\nasync function chat(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/claude-sonnet-4.5",\n      messages: [\n        { role: "system", content: "" },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nchat("Tulis cerpen tentang robot yang belajar melukis.").then(console.log);\n'},
+     code:'// NodeRouter - DeepSeek Reasoner (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/deepseek-reasoner",messages:[{role:"system",content:""},{role:"user",content:"Jelaskan quicksort langkah demi langkah."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
+    {id:"grok-4-fast-reasoning",slug:"noderouter/grok-4-fast-reasoning",name:"Grok 4 Fast Reasoning",desc:"Model reasoning cepat dari xAI, unggul untuk problem-solving dan analisis real-time.",color:"#1DA1F2",ctx:"128K",endpoint:"/v1/completions",latency:"~650ms",tags:["Reasoning","Cepat","Real-time"],file:"grok-4-fast-reasoning.fetch.js",
+     code:'// NodeRouter - Grok 4 Fast Reasoning (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/grok-4-fast-reasoning",messages:[{role:"system",content:""},{role:"user",content:"Apa solusi terbaik untuk kemacetan Jakarta?"}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
     {id:"gpt-5.5",slug:"noderouter/gpt-5.5",name:"GPT-5.5",desc:"Model general-purpose terbaru dengan performa tinggi untuk berbagai tugas: chat, ringkasan, terjemahan, dan brainstorming.",color:"#10A37F",ctx:"256K",endpoint:"/v1/completions",latency:"~490ms",tags:["General","Cepat","Multi-task"],file:"gpt-5.5.fetch.js",
-     code:'// NodeRouter - GPT-5.5\nconst E = "https://fatahciken.vercel.app/v1/completions";\n\nasync function ask(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/gpt-5.5",\n      messages: [\n        { role: "system", content: "" },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nask("Beri 5 ide startup AI 2026.").then(console.log);\n'},
+     code:'// NodeRouter - GPT-5.5 (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/gpt-5.5",messages:[{role:"system",content:""},{role:"user",content:"Beri 5 ide startup AI 2026."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
     {id:"qwen-3.6-plus",slug:"noderouter/qwen-3.6-plus",name:"Qwen 3.6 Plus",desc:"Model multibahasa andal untuk percakapan, ringkasan dokumen, dan pemahaman teks dalam berbagai bahasa termasuk Indonesia.",color:"#6366F1",ctx:"128K",endpoint:"/v1/completions",latency:"~430ms",tags:["Multibahasa","Ringkasan","Chat"],file:"qwen-3.6-plus.fetch.js",
-     code:'// NodeRouter - Qwen 3.6 Plus\nconst E = "https://fatahciken.vercel.app/v1/completions";\n\nasync function qwen(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/qwen-3.6-plus",\n      messages: [\n        { role: "system", content: "" },\n        { role: "user", content: p },\n      ],\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.content;\n}\n\nqwen("Jelaskan gotong royong di Indonesia.").then(console.log);\n'},
-    {id:"gemini-3-pro-preview",slug:"noderouter/gemini-3-pro-preview",name:"Gemini 3 Pro",desc:"Model konteks panjang 512K token untuk analisis dokumen besar, riset mendalam, dan pemrosesan multi-file.",color:"#4285F4",ctx:"512K",endpoint:"/v1/completions",latency:"~710ms",tags:["Konteks panjang","Riset","Dokumen"],file:"gemini-3-pro-preview.fetch.js",
-     code:'// NodeRouter - Gemini 3 Pro\nconst E = "https://fatahciken.vercel.app/v1/completions";\n\nasync function gemini(doc) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/gemini-3-pro-preview",\n      messages: [\n        { role: "system", content: "" },\n        { role: "user", content: doc },\n      ],\n      stream: true,\n    }),\n  });\n  const reader = r.body.getReader();\n  const dec = new TextDecoder();\n  let full = "";\n  while(true){const{v,d}=await reader.read();if(d)break;full+=dec.decode(v,{stream:true})}\n  return full;\n}\n'},
+     code:'// NodeRouter - Qwen 3.6 Plus (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/qwen-3.6-plus",messages:[{role:"system",content:""},{role:"user",content:"Jelaskan budaya gotong royong di Indonesia."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
+    {id:"gemini-2.5-flash",slug:"noderouter/gemini-2.5-flash",name:"Gemini 2.5 Flash",desc:"Model cepat Google dengan konteks 1M token, cocok untuk tugas harian dan analisis cepat.",color:"#4285F4",ctx:"512K",endpoint:"/v1/completions",latency:"~550ms",tags:["Cepat","Konteks panjang","Google"],file:"gemini-2.5-flash.fetch.js",
+     code:'// NodeRouter - Gemini 2.5 Flash (SSE)\nconst E = "'+API_BASE+'/v1/completions";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/gemini-2.5-flash",messages:[{role:"system",content:""},{role:"user",content:"Ringkas manfaat AI untuk UMKM."}]})\n}).then(async r=>{\n  const reader=r.body.getReader(),decoder=new TextDecoder();\n  let buf="",full="";\n  while(true){\n    const{done,value}=await reader.read();\n    if(done)break;\n    buf+=decoder.decode(value,{stream:true});\n    const lines=buf.split("\\n");buf=lines.pop();\n    for(const line of lines){\n      if(!line.startsWith("data: "))continue;\n      const d=line.slice(6);\n      if(d==="[DONE]"){console.log(full);return;}\n      try{const t=JSON.parse(d).content;full+=t;process.stdout.write(t)}catch(e){}\n    }\n  }\n});\n'},
     {id:"flux-schnell",slug:"noderouter/flux-schnell",name:"Flux Schnell",desc:"Model image generation cepat untuk kreasi visual, desain, dan seni digital.",color:"#EC4899",ctx:"N/A",endpoint:"/v1/images",latency:"~1.2s",tags:["Image Gen","Kreatif","Desain"],file:"flux-schnell.fetch.js",
-     code:'// NodeRouter - Flux Schnell\nconst E = "https://fatahciken.vercel.app/v1/images";\n\nasync function img(p) {\n  const r = await fetch(E, {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({\n      model: "noderouter/flux-schnell",\n      prompt: p,\n    }),\n  });\n  if (!r.ok) throw new Error("HTTP " + r.status);\n  const d = await r.json();\n  return d.image_url;\n}\n\nimg("A futuristic city at sunset").then(u => console.log("Image:", u));\n'}
+     code:'// NodeRouter - Flux Schnell\nconst E = "'+API_BASE+'/v1/images";\n\nfetch(E,{\n  method:"POST",\n  headers:{"Content-Type":"application/json"},\n  body:JSON.stringify({model:"noderouter/flux-schnell",prompt:"A futuristic city at sunset"})\n}).then(r=>r.json()).then(d=>console.log("Image:",d.image_url));\n'}
   ];
 
   var state = { modelIndex:2 };
@@ -515,7 +313,6 @@ Content-Type: application/json
     document.getElementById('overlay').classList.add('active');
     currentPanel = name;
   };
-
   window.closePanel = function(){
     if(currentPanel){
       var cap = currentPanel.charAt(0).toUpperCase() + currentPanel.slice(1);
@@ -524,7 +321,6 @@ Content-Type: application/json
       currentPanel = null;
     }
   };
-
   document.getElementById('overlay').addEventListener('click', closePanel);
 
   function renderPanelModels(){
@@ -543,7 +339,6 @@ Content-Type: application/json
     welcomeEl.classList.add('leaving');
     setTimeout(function(){ welcomeEl.classList.add('hidden'); loadingEl.classList.remove('hidden'); runLoadingSequence(); }, 480);
   }
-
   document.getElementById('startedBtn').addEventListener('click', goToLoading);
 
   document.getElementById('communityBtn').addEventListener('click', function(){
@@ -585,7 +380,6 @@ Content-Type: application/json
   function initViewer(){
     if(viewerInited){ renderAll(); return; }
     viewerInited = true;
-
     modelSelectWrap = document.getElementById('modelSelectWrap');
     modelSelectBtn = document.getElementById('modelSelectBtn');
     modelDropdown = document.getElementById('modelDropdown');
@@ -627,7 +421,7 @@ Content-Type: application/json
       l = l.replace(/(&quot;.*?&quot;|'[^']*'|`[^`]*`)/g, '<span class="tok-str">$1</span>');
       l = l.replace(/\b(const|let|var|async|await|function|return|new|import|from|require|export|default|if|else|for|of|in|true|false|null)\b/g, '<span class="tok-kw">$1</span>');
       l = l.replace(/\b(NodeRouter|AbortController|Promise|Error)\b/g, '<span class="tok-class">$1</span>');
-      l = l.replace(/\b([a-zA-Z_$][\w$]*)(?=\()/g, function(m,p1){ return /^(console|JSON|fetch|Error)$/.test(p1) ? m : '<span class="tok-fn">'+p1+'</span>'; });
+      l = l.replace(/\b([a-zA-Z_$][\w$]*)(?=\()/g, function(m,p1){ return /^(console|JSON|fetch|Error|process)$/.test(p1) ? m : '<span class="tok-fn">'+p1+'</span>'; });
       l = l.replace(/:\s*([a-zA-Z_][\w$]*)(?=[,\n]|$)/g, function(m,p1){ return ': <span class="tok-prop">'+p1+'</span>'; });
       l = l.replace(/\b(\d+\.?\d*)\b/g, '<span class="tok-num">$1</span>');
       return l;
@@ -660,6 +454,5 @@ Content-Type: application/json
 
 })();
 </script>
-
 </body>
 </html>
