@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NodeRouter Chat</title>
+<style>
+*{box-sizing:border-box;}
+body{font-family:system-ui;max-width:600px;margin:30px auto;padding:16px;background:#111;color:#fff;}
+h3{font-weight:700;font-size:18px;margin:0 0 14px;}
+#chat{border:1px solid #333;padding:12px;height:380px;overflow-y:auto;margin-bottom:10px;white-space:pre-wrap;border-radius:8px;font-size:13px;line-height:1.5;background:#1a1a1a;}
+#chat .you{color:#7DD3FC;}
+#chat .ai{color:#9CDA84;}
+textarea{width:100%;background:#222;color:#fff;border:1px solid #555;padding:10px;border-radius:8px;font-family:inherit;font-size:13px;resize:none;}
+button{margin-top:8px;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:13px;}
+.btn-send{background:#10A37F;color:#fff;}
+.btn-reset{background:#333;color:#fff;margin-left:6px;}
+#status{font-size:11px;color:#888;margin-left:10px;}
+@media(max-width:480px){#chat{height:280px;}}
+</style>
+</head>
+<body>
+
+<h3>NodeRouter Chat</h3>
+<div id="chat"></div>
+<textarea id="input" placeholder="Ketik pesan..." rows="2"></textarea>
+<button class="btn-send" onclick="send()">Kirim</button>
+<button class="btn-reset" onclick="reset()">Reset</button>
+<span id="status">Ready</span>
+
+<script>
+const ENDPOINT = "https://noderouter.ldop.com/v1/completions";
+const chatEl = document.getElementById('chat');
+const inputEl = document.getElementById('input');
+const statusEl = document.getElementById('status');
+
+function append(role, text) {
+  const cls = role === 'user' ? 'you' : 'ai';
+  chatEl.textContent += '\n\n' + (role === 'user' ? 'You: ' : 'AI: ') + text;
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+async function send() {
+  const msg = inputEl.value.trim();
+  if (!msg) return;
+
+  inputEl.value = '';
+  inputEl.disabled = true;
+  statusEl.textContent = 'Thinking...';
+
+  append('user', msg);
+  chatEl.textContent += '\n\nAI: ';
+
+  try {
+    const res = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'noderouter/gpt-5.5',
+        messages: [{ role: 'user', content: msg }]
+      })
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const json = line.slice(6);
+        if (json === '[DONE]') break;
+        try {
+          const chunk = JSON.parse(json).content || '';
+          chatEl.textContent += chunk;
+          chatEl.scrollTop = chatEl.scrollHeight;
+        } catch (e) {}
+      }
+    }
+  } catch (e) {
+    chatEl.textContent += '[Error: ' + e.message + ']';
+  }
+
+  inputEl.disabled = false;
+  inputEl.focus();
+  statusEl.textContent = 'Ready';
+}
+
+function reset() {
+  chatEl.textContent = 'Percakapan baru.';
+  statusEl.textContent = 'Ready';
+  inputEl.focus();
+}
+
+inputEl.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+
+chatEl.textContent = 'Percakapan baru.';
+inputEl.focus();
+</script>
+</body>
+</html>
