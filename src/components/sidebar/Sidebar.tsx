@@ -1,6 +1,6 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, MessageSquare, Settings, ChevronLeft, Bot } from 'lucide-react'
+import { Plus, MessageSquare, ChevronLeft, Bot, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
 interface Props {
@@ -10,9 +10,14 @@ interface Props {
   activeChat: string | null
   onNewChat: () => void
   onSelectChat: (id: string) => void
+  models: { id: string }[]
+  selectedModel: string
+  onSelectModel: (model: string) => void
 }
 
-export default function Sidebar({ isOpen, onToggle, chats, activeChat, onNewChat, onSelectChat }: Props) {
+export default function Sidebar({ isOpen, onToggle, chats, activeChat, onNewChat, onSelectChat, models, selectedModel, onSelectModel }: Props) {
+  const [modelOpen, setModelOpen] = useState(false)
+
   return (
     <>
       <AnimatePresence>
@@ -22,9 +27,8 @@ export default function Sidebar({ isOpen, onToggle, chats, activeChat, onNewChat
             animate={{ x: 0 }}
             exit={{ x: -320 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed md:relative z-40 w-80 h-full bg-[#0a0a0a] border-r border-[#1a1a2e] flex flex-col"
+            className="fixed md:relative z-40 w-80 h-full bg-[#09090b] border-r border-[#1a1a2e] flex flex-col"
           >
-            {/* Header */}
             <div className="p-4 border-b border-[#1a1a2e]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -47,7 +51,32 @@ export default function Sidebar({ isOpen, onToggle, chats, activeChat, onNewChat
               </motion.button>
             </div>
 
-            {/* Chat List */}
+            {/* Model Selector */}
+            <div className="px-4 py-3 border-b border-[#1a1a2e]">
+              <button
+                onClick={() => setModelOpen(!modelOpen)}
+                className="w-full text-left px-3 py-2 rounded-lg bg-[#111] border border-[#27272a] text-sm text-gray-300 flex items-center justify-between hover:border-gray-600"
+              >
+                <span className="truncate">{selectedModel}</span>
+                <Sparkles size={14} className="text-yellow-400 flex-shrink-0" />
+              </button>
+              {modelOpen && (
+                <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
+                  {models.map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => { onSelectModel(m.id); setModelOpen(false) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors ${
+                        selectedModel === m.id ? 'bg-blue-600/20 text-blue-400' : 'text-gray-400 hover:bg-[#111] hover:text-white'
+                      }`}
+                    >
+                      {m.id.replace('noderouter/', '')}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="flex-1 overflow-y-auto p-2">
               <p className="text-xs text-gray-500 px-3 py-2 uppercase tracking-wider">Recent Chats</p>
               {chats.map((chat, i) => (
@@ -68,19 +97,10 @@ export default function Sidebar({ isOpen, onToggle, chats, activeChat, onNewChat
                 </motion.button>
               ))}
             </div>
-
-            {/* Footer */}
-            <div className="p-4 border-t border-[#1a1a2e]">
-              <button className="w-full text-left px-3 py-3 rounded-xl flex items-center gap-3 text-sm text-gray-400 hover:bg-[#111] hover:text-white transition-colors">
-                <Settings size={16} />
-                Settings
-              </button>
-            </div>
           </motion.aside>
         )}
       </AnimatePresence>
 
-      {/* Toggle button when closed */}
       {!isOpen && (
         <motion.button
           initial={{ opacity: 0 }}

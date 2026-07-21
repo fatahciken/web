@@ -23,10 +23,10 @@ export default function ChatInput({ onSend, isStreaming }: Props) {
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       onSubmit={handleSubmit}
-      className="border-t border-[#1a1a2e] bg-[#0a0a0a] p-4"
+      className="border-t border-[#27272a] bg-[#09090b] p-4"
     >
-      <div className="max-w-4xl mx-auto flex gap-3 items-end">
-        <div className="flex-1 bg-[#111] border border-[#2a2a3e] rounded-2xl flex items-end overflow-hidden focus-within:border-blue-500/50 transition-colors">
+      <div className="max-w-3xl mx-auto flex gap-3 items-end">
+        <div className="flex-1 bg-[#18181b] border border-[#27272a] rounded-2xl flex items-end overflow-hidden focus-within:border-blue-500/50 transition-colors">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}

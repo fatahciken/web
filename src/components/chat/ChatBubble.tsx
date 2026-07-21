@@ -2,8 +2,7 @@
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useState } from 'react'
-import { Bot, User, Copy, Check } from 'lucide-react'
+import { Bot, User } from 'lucide-react'
 
 interface Props {
   role: 'user' | 'assistant'
@@ -12,14 +11,7 @@ interface Props {
 }
 
 export default function ChatBubble({ role, content, isStreaming }: Props) {
-  const [copied, setCopied] = useState(false)
   const isAI = role === 'assistant'
-
-  const copyCode = async (code: string) => {
-    await navigator.clipboard.writeText(code)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   return (
     <motion.div
@@ -41,34 +33,41 @@ export default function ChatBubble({ role, content, isStreaming }: Props) {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                pre({ children }) {
-                  return <pre className="relative bg-[#0a0a1a] rounded-lg p-4 overflow-x-auto my-2 border border-[#2a2a3e]">{children}</pre>
-                },
-                code({ className, children, ...props }) {
+                pre: ({ children }) => (
+                  <pre className="bg-[#0a0a1a] rounded-lg p-4 overflow-x-auto my-2 border border-[#2a2a3e] text-sm">
+                    {children}
+                  </pre>
+                ),
+                code: ({ className, children, ...props }) => {
                   const isBlock = className?.includes('language-')
                   const match = /language-(\w+)/.exec(className || '')
                   return isBlock ? (
-                    <div className="relative">
-                      <div className="flex justify-between items-center px-4 py-2 bg-[#0f0f23] rounded-t-lg border border-[#2a2a3e] border-b-0">
-                        <span className="text-xs text-gray-400">{match?.[1] || 'code'}</span>
-                        <button onClick={() => copyCode(String(children))} className="text-gray-400 hover:text-white">
-                          {copied ? <Check size={14} /> : <Copy size={14} />}
-                        </button>
-                      </div>
-                      <code className={className} {...props}>{children}</code>
+                    <div>
+                      {match && (
+                        <div className="bg-[#0f0f23] rounded-t-lg px-4 py-1 text-xs text-gray-400 border border-[#2a2a3e] border-b-0">
+                          {match[1]}
+                        </div>
+                      )}
+                      <pre className="bg-[#0a0a1a] rounded-b-lg rounded-t-none p-4 overflow-x-auto border border-[#2a2a3e] text-sm">
+                        <code className={className} {...props}>{children}</code>
+                      </pre>
                     </div>
                   ) : (
-                    <code className="bg-[#1a1a2e] px-1.5 py-0.5 rounded text-pink-400 text-sm" {...props}>{children}</code>
+                    <code className="bg-[#1a1a2e] px-1.5 py-0.5 rounded text-pink-400 text-sm" {...props}>
+                      {children}
+                    </code>
                   )
-                }
+                },
               }}
             >
-              {content}
+              {content || '...'}
             </ReactMarkdown>
-            {isStreaming && <span className="inline-block w-2 h-4 bg-blue-400 animate-pulse ml-1 rounded-sm" />}
+            {isStreaming && content && (
+              <span className="inline-block w-2 h-4 bg-blue-400 animate-pulse ml-1 rounded-sm align-middle" />
+            )}
           </div>
         ) : (
-          <p className="text-white text-sm">{content}</p>
+          <p className="text-white text-sm whitespace-pre-wrap">{content}</p>
         )}
       </div>
     </motion.div>
