@@ -1,0 +1,4 @@
+backend/
+setup.sh
+*.md
+.git
