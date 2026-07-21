@@ -1,4 +1,3 @@
-cat > setup.sh << 'SETUPEOF'
 #!/bin/bash
 set -e
 
@@ -711,9 +710,3 @@ echo "📦 Push ke GitHub dan deploy ke Vercel:"
 echo "  git add . && git commit -m 'CIKEN AI Setup' && git push"
 echo ""
 echo "Domain kamu nanti: fatahciken.vercel.app"
-SETUPEOF
-
-chmod +x setup.sh
-echo "✅ Script setup.sh dibuat! Jalankan:"
-echo ""
-echo "  bash setup.sh"
